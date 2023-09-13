@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Krona+One&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Customize the scrollbar track */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+/* Customize the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the thumb */
+  border-radius: 6px; /* Rounded corners for the thumb */
+}
+
+/* Customize the scrollbar track when hovering over it */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Color of the thumb on hover */
+}
+
+/* Customize the scrollbar track */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Color of the track */
+}
+
+/* Customize the scrollbar track when hovering over it */
+::-webkit-scrollbar-track:hover {
+  background-color: #ddd; /* Color of the track on hover */
+}
+
+body {
+  color: #373d3f;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: "Manrope", sans-serif;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #101010;
+  font-weight: 600;
+}
+
+label {
+  color: #101010;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.auth-bg {
+  background: linear-gradient(
+    0deg,
+    rgba(23, 150, 227, 0.52) 0%,
+    rgba(0, 0, 0, 0.63) 100%
+  );
+}
+
+.font-krona-one {
+  font-family: "Krona One", sans-serif;
+  font-weight: 400 !important;
+}
+
+.box-shadow {
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.07);
+}
+
+ul,
+li {
+  list-style: none;
+}
+
+.content {
+  width: calc(100% - 248px);
+}
+
+.content-height {
+  height: calc(100vh - 89px);
+}
+
+/* custom.css */
+.table-container {
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+/* Optionally, you can style the scrollbar */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+
+/* CSS for screens with a maximum width of 767 pixels (typically for mobile devices) */
+@media screen and (max-width: 768px) {
+  /* Your mobile-specific styles go here */
+  .content {
+    width: 100%;
+  }
+}
