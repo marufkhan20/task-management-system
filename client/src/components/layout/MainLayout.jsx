@@ -22,7 +22,7 @@ const MainLayout = ({ category, setCategory, children }) => {
         <div className="md:hidden">
           <MobileHeader setShowSidebar={setShowSidebar} />
         </div>
-        <Header />
+        <Header category={category} />
         {children}
       </div>
     </div>

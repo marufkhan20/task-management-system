@@ -12,6 +12,8 @@ const Tasks = ({ category }) => {
   const [openSwitchAlert, setOpenSwitchAlert] = useState(false);
   const [selectedTaskStatus, setSelectedTaskStatus] = useState("ongoing");
 
+  const [previousCategory, setPreviousCategory] = useState();
+
   // current active task handler
   const currentActiveTaskHandler = (id) => {
     if (currentActiveTask?._id) {
@@ -37,17 +39,23 @@ const Tasks = ({ category }) => {
   const [allTasks, setAllTasks] = useState([]);
   const [getTasks, setGetTasks] = useState(false);
 
-  useEffect(() => {
-    if (category?._id) {
-      setGetTasks(true);
-    }
-  }, [category]);
-
-  const { data } = useGetTasksByCategoryQuery(category?._id, {
+  const { data, refetch } = useGetTasksByCategoryQuery(category?._id, {
     skip: !getTasks,
   });
 
   useEffect(() => {
+    if (category?._id) {
+      setGetTasks(true);
+      setPreviousCategory(category?._id);
+    }
+
+    if (previousCategory && previousCategory !== category?._id) {
+      refetch();
+    }
+  }, [category, previousCategory, refetch]);
+
+  useEffect(() => {
+    setAllTasks([]);
     if (data?.length > 0) {
       setAllTasks(data);
     }
@@ -68,6 +76,8 @@ const Tasks = ({ category }) => {
         <CurrentTask
           setCurrentActiveTask={setCurrentActiveTask}
           currentActiveTask={currentActiveTask}
+          setAllTasks={setAllTasks}
+          allTasks={allTasks}
         />
       )}
 

@@ -5,9 +5,17 @@ const Task = require("../models/Task");
 const getTasksByCategoryController = async (req, res) => {
   try {
     const { categoryId } = req.params || {};
+    let tasks;
+    console.log("category", categoryId);
 
-    // get all tasks by category
-    const tasks = await Task.find({ category: categoryId });
+    if (categoryId === "all-tasks") {
+      tasks = await Task.find();
+    } else if (categoryId === "inbox") {
+      tasks = await Task.find({ category: "inbox" });
+    } else {
+      // get all tasks by category
+      tasks = await Task.find({ category: categoryId });
+    }
 
     res.status(200).json(tasks);
   } catch (err) {
@@ -54,7 +62,7 @@ const createNewTaskController = async (req, res) => {
       name,
       startTime,
       endTime,
-      category,
+      category: category?._id ? category : "inbox",
       createdOn,
       tags,
       description,

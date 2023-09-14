@@ -11,7 +11,7 @@ const Button = ({ onClick, className, type, children }) => {
   ) : type === "error" ? (
     <button
       onClick={onClick}
-      className={`block w-full px-4 py-[13px] bg-transparent rounded-lg border bg-alert border-alert text-white font-semibold transition-all hover:bg-alert hover:border-alert hover:text-white ${className}`}
+      className={`block w-full px-4 py-[13px] bg-transparent rounded-lg border bg-alert border-alert text-alert font-semibold transition-all hover:bg-alert hover:border-alert hover:text-white ${className}`}
     >
       {children}
     </button>

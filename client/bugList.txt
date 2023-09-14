@@ -1,0 +1,46 @@
+Missing:
+
+- "created on" field should be set as today automatically --- fix
+
+- "All Tasks" should show all tasks in all categories and types of tasks --- fix
+
+- Please make the date dynamic. --- fix.
+
+- "Are you sure you want to delete" screen the "Yes" is white against the white background and cannot be seen. --- fix
+
+- Total time today doesn't reflect total time today. --- fix
+
+- For Current Task, green button should be "Complete" --- fix
+
+- Other than "Personal" and "Work", the routes for the other categories are not working. --- fix
+
+- Users should be allowed to create a new task without specifying a category, and this task will go into the "Inbox". --- fix
+
+- in the screen where the user is creating a new task, delete the time display for the stop watch because it's not doing anything - so just allow "Set a stopwatch" checkbox --- fix
+
+- Even if the user hasn't selected the stopwatch when creating the task (i.e. if the user only selects a countdown timer or a Pomodoro clock), clicking the "clock" icon of a current task can still display the stopwatch (i.e. the time elapsed) for the Current Task. --- fix
+
+- "counting up timer" and "Pomodoro timer" tasks are not working --- fix
+
+- The checkboxes of the Completed tasks are not currently checked, and cannot be unchecked. Please allow the user to uncheck Completed Tasks, which will make the "Completed Tasks" "Ongoing Tasks. --- fix
+
+- Timer for the Ongoing Tasks should not be running. If a task's timer is running, it should be an Ongoing Task - and there should only be one Ongoing Task at one time (with the timer running) --- fix
+
+- "Schedule for later" button is not working --- fix
+
+======== do it fix =======
+
+Issues and notes:
+
+- Please add a way to delete and edit the name of a category (maybe create the 3 dots beside the name of the category in the Task Page for the user to click into and select delete?)
+
+- On the "All Tasks', Inbox any category page, clicking any tag should filter out the tasks based on the tag
+
+- Please find a way for the user to edit the time of the timer of the Current Task and the Ongoing Tasks
+
+Mobile responsive:
+- for the plus button, no need to have the option to select "New Category" - should go straight to the screen to create a new task.
+
+
+
+The list is not all - please continue working on fixing the app. Thank you Rashedul.

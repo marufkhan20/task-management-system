@@ -47,6 +47,59 @@ const SelectTimer = ({
     setEditableTime,
   ]);
 
+  // set stop watch timer state and functionlities
+  const [stopWatchHours, setStopWatchHours] = useState();
+  const [stopWatchMinutes, setStopWatchMinutes] = useState();
+  const [stopWatchSeconds, setStopWatchSeconds] = useState();
+  const [stopwatchMode, setStopWatchMode] = useState(false);
+
+  // Convert Input to Actual Time
+  useEffect(() => {
+    if (stopWatchHours || stopWatchMinutes || stopWatchSeconds) {
+      setStopWatchMode(true);
+    } else {
+      setStopWatchMode(false);
+    }
+
+    if (stopWatchHours && stopWatchMinutes && stopWatchSeconds) {
+      const startTime = new Date();
+      startTime.setHours(
+        startTime?.getHours(),
+        startTime?.getMinutes(),
+        startTime.getSeconds(),
+        0
+      );
+      setStartTime(startTime);
+
+      const endTime = new Date();
+      endTime.setHours(
+        startTime.getHours() + Number(stopWatchHours),
+        startTime.getMinutes() + Number(stopWatchMinutes),
+        startTime.getSeconds() + Number(stopWatchSeconds),
+        0
+      );
+      setEndTime(endTime);
+    }
+
+    // set editable time
+    setEditableTime({
+      stopWatchHours,
+      stopWatchMinutes,
+      stopWatchSeconds,
+    });
+  }, [
+    startHour,
+    startMinute,
+    endHour,
+    endMinute,
+    setStartTime,
+    setEndTime,
+    setEditableTime,
+    stopWatchHours,
+    stopWatchMinutes,
+    stopWatchSeconds,
+  ]);
+
   // set pomodoro timer state and functionlities
   const [durationHour, setDurationHour] = useState();
   const [durationMinute, setDurationMinute] = useState();
@@ -208,7 +261,7 @@ const SelectTimer = ({
                   </div>
                 </div>
               </div>
-              <span className="mt-8">Or</span>
+              {/* <span className="mt-8">Or</span>
               <div>
                 <h3 className="mb-5">Set a countdown</h3>
                 <div className="flex items-center gap-3">
@@ -228,13 +281,14 @@ const SelectTimer = ({
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="my-6 px-5 text-center">
             <span className="font-medium px-2 bg-white">And/Or</span>
             <hr className="-mt-[10px]" />
           </div>
+
           <div className="px-5 pb-5">
             <h3>Set a stopwatch (Counting Up)</h3>
             <div className="mt-5 flex items-center gap-6">
@@ -245,25 +299,37 @@ const SelectTimer = ({
                       type="text"
                       placeholder="00"
                       className="outline-none w-8 text-center"
+                      value={stopWatchHours}
+                      onChange={(e) => setStopWatchHours(e.target.value)}
                     />
                     <span>:</span>
                     <input
                       type="text"
                       placeholder="00"
                       className="outline-none w-8 text-center"
+                      value={stopWatchMinutes}
+                      onChange={(e) => setStopWatchMinutes(e.target.value)}
                     />
                     <span>:</span>
                     <input
                       type="text"
                       placeholder="00"
                       className="outline-none w-8 text-center"
+                      value={stopWatchSeconds}
+                      onChange={(e) => setStopWatchSeconds(e.target.value)}
                     />
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <input type="checkbox" name="" id="stopwatch" />
+                <input
+                  type="checkbox"
+                  name=""
+                  id="stopwatch"
+                  checked={stopwatchMode}
+                  onChange={() => setStopWatchMode(!stopwatchMode)}
+                />
                 <label
                   htmlFor="stopwatch"
                   className="text-heading text-xs font-medium cursor-pointer"
@@ -394,7 +460,22 @@ const SelectTimer = ({
 
       {/* footer */}
       <div className="px-5 py-4 flex items-center justify-between  border-t border-light-secondary">
-        <button className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white">
+        <button
+          className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white"
+          onClick={() => {
+            setTimeNow({
+              startHour,
+              startMinute,
+              endHour,
+              endMinute,
+            });
+            setTimerType(
+              stopWatchHours || stopWatchMinutes || stopWatchSeconds
+                ? "stopwatch"
+                : selectOpt
+            );
+          }}
+        >
           Schedule for later
         </button>
         <button
@@ -406,7 +487,11 @@ const SelectTimer = ({
               endHour,
               endMinute,
             });
-            setTimerType(selectOpt);
+            setTimerType(
+              stopWatchHours || stopWatchMinutes || stopWatchSeconds
+                ? "stopwatch"
+                : selectOpt
+            );
           }}
         >
           Set Now

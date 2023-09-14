@@ -1,10 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiOutlineClose, AiOutlinePause } from "react-icons/ai";
 import { BsHourglassTop } from "react-icons/bs";
 import { IoCheckmarkSharp, IoReloadSharp } from "react-icons/io5";
 import { PiTimer } from "react-icons/pi";
+import { useUpdateTaskStatusMutation } from "../../features/task/taskApi";
 
-const CurrentTask = ({ setCurrentActiveTask, currentActiveTask }) => {
+const CurrentTask = ({
+  setCurrentActiveTask,
+  currentActiveTask,
+  setAllTasks,
+  allTasks,
+}) => {
   // set currentActivePrevent taks
   const [preventTask, setPreventTask] = useState({});
 
@@ -56,8 +64,31 @@ const CurrentTask = ({ setCurrentActiveTask, currentActiveTask }) => {
     }
   }, [currentActiveTask, preventTask]);
 
-  const { name, description, tags } = currentActiveTask || {};
+  const { _id, name, description, tags } = currentActiveTask || {};
 
+  // update task status api request
+  const [updateTaskStatus, { data: updatedTask }] =
+    useUpdateTaskStatusMutation();
+
+  useEffect(() => {
+    if (updatedTask?._id) {
+      toast.success("Task completed successfully");
+      setCurrentActiveTask({});
+      const updatedTasks = allTasks?.map((item) => {
+        if (item?._id === updatedTask?._id) {
+          return { ...item, status: updatedTask?.status };
+        } else {
+          return item;
+        }
+      });
+
+      setAllTasks(updatedTasks);
+    }
+  }, [updatedTask]);
+
+  const completeTask = () => {
+    updateTaskStatus({ id: _id, status: "completed" });
+  };
   return (
     <div className="mt-4">
       <h2 className="text-lg text-secondary border-b border-light-secondary py-3">
@@ -120,9 +151,12 @@ const CurrentTask = ({ setCurrentActiveTask, currentActiveTask }) => {
                 <AiOutlinePause />
                 <span>Pause</span>
               </button>
-              <button className="flex items-center gap-4 py-2 px-3 rounded bg-success text-white font-medium cursor-pointer transition-all hover:bg-success/70">
+              <button
+                className="flex items-center gap-4 py-2 px-3 rounded bg-success text-white font-medium cursor-pointer transition-all hover:bg-success/70"
+                onClick={completeTask}
+              >
                 <IoCheckmarkSharp />
-                <span>Pause</span>
+                <span>Complete</span>
               </button>
             </div>
             <AiOutlineClose

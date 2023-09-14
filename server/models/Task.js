@@ -11,9 +11,7 @@ const taskSchema = new Schema(
     startTime: Date,
     endTime: Date,
     category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
+      type: String,
     },
     tags: String,
     createdOn: String,

@@ -65,18 +65,30 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
         <div>
           <li
             className={`flex items-center gap-4 py-[10px] px-[18px] transition-all hover:bg-white cursor-pointer ${
-              category === "all-tasks" && "bg-white"
+              category?._id === "all-tasks" && "bg-white"
             }`}
-            onClick={() => setCategory("all-tasks")}
+            onClick={() => {
+              setCategory({
+                _id: "all-tasks",
+                title: "All Tasks",
+              });
+              setShowSidebar(false);
+            }}
           >
             <img className="w-5 h-5" src="/img/icons/Calender.svg" alt="icon" />
             <span className="text-heading font-semibold">All Tasks</span>
           </li>
           <li
             className={`flex items-center gap-4 py-[10px] px-[18px] transition-all hover:bg-white cursor-pointer ${
-              category === "inbox" && "bg-white"
+              category?._id === "inbox" && "bg-white"
             }`}
-            onClick={() => setCategory("inbox")}
+            onClick={() => {
+              setCategory({
+                _id: "inbox",
+                title: "Inbox",
+              });
+              setShowSidebar(false);
+            }}
           >
             <img className="w-5 h-5" src="/img/icons/email.svg" alt="icon" />
             <span className="text-heading font-semibold">Inbox</span>

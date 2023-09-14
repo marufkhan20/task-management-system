@@ -36,7 +36,7 @@ const TasksContainer = ({
             )}
             <BsThreeDots className="text-lg cursor-pointer" />
           </div>
-          {status === "ongoing" && <h4>4h 52m</h4>}
+          {/* {status === "ongoing" && <h4>4h 52m</h4>} */}
         </div>
 
         {/* all tasks */}
@@ -45,7 +45,12 @@ const TasksContainer = ({
             <thead>
               <tr>
                 <th class="px-6 py-3 text-left leading-4 text-heading font-semibold tracking-wider">
-                  <input type="checkbox" name="" id="" />
+                  <input
+                    type="checkbox"
+                    checked={status === "completed"}
+                    name=""
+                    id=""
+                  />
                 </th>
                 <th class="px-6 py-3 text-left leading-4 text-heading font-semibold tracking-wider">
                   Task Name

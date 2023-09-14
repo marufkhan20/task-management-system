@@ -72,15 +72,16 @@ const TaskItem = ({
         } else if (
           new Date(task?.startTime) <= new Date() &&
           new Date(task?.endTime) >= new Date() &&
-          task?.status !== "ongoing"
+          task?.status === "upcoming"
         ) {
           updateTaskStatus({ id: task?._id, status: "ongoing" });
-        } else if (
-          new Date() > new Date(task?.endTime) &&
-          task?.status !== "completed"
-        ) {
-          updateTaskStatus({ id: task?._id, status: "completed" });
         }
+        // else if (
+        //   new Date() > new Date(task?.endTime) &&
+        //   task?.status !== "completed"
+        // ) {
+        //   updateTaskStatus({ id: task?._id, status: "completed" });
+        // }
 
         // Assuming you have start and end times in ISO 8601 format
         const startTimeStr = task?.startTime;
@@ -95,7 +96,7 @@ const TaskItem = ({
 
         // Calculate the time difference in milliseconds
         const timeDifference =
-          status === "ongoing"
+          task?.timerType === "stopwatch"
             ? endTime - (currentTime >= startTime ? currentTime : startTime)
             : endTime - startTime;
 
@@ -104,15 +105,17 @@ const TaskItem = ({
         const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
         const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
 
-        setCompletedTaskTime({
-          hours: hoursNow,
-          minutes: minutesNow,
-          seconds: secondsNow,
-        });
-
-        setHours(hoursNow);
-        setMinutes(minutesNow);
-        setSeconds(secondsNow);
+        if (task?.timerType === "stopwatch") {
+          setHours(hoursNow);
+          setMinutes(minutesNow);
+          setSeconds(secondsNow);
+        } else {
+          setCompletedTaskTime({
+            hours: hoursNow,
+            minutes: minutesNow,
+            seconds: secondsNow,
+          });
+        }
       }, 1000);
     }
     return () => {
@@ -137,7 +140,6 @@ const TaskItem = ({
   const deleteSubmitHandler = () => {
     deleteTask(task?._id);
   };
-
   return (
     <>
       <tr
@@ -146,7 +148,16 @@ const TaskItem = ({
         }`}
       >
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
-          <input type="checkbox" name="" id="" />
+          <input
+            type="checkbox"
+            checked={task?.status === "completed"}
+            name=""
+            id=""
+            onChange={() =>
+              task?.status === "completed" &&
+              updateTaskStatus({ id: task?._id, status: "ongoing" })
+            }
+          />
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
           {task?.name}
@@ -176,9 +187,16 @@ const TaskItem = ({
           )}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
-          {status === "ongoing" && `${hours}h ${minutes}m ${seconds}s`}
+          {task?.timerType === "stopwatch" &&
+            `${hours}h ${minutes}m ${seconds}s`}
+
           {status === "upcoming" && "N/A"}
+
           {status === "completed" &&
+            `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
+
+          {status === "ongoing" &&
+            task?.timerType !== "stopwatch" &&
             `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap flex items-center gap-2">
@@ -237,6 +255,10 @@ const TaskItem = ({
               type="checkbox"
               name=""
               id=""
+              onChange={() =>
+                status === "completed" &&
+                updateTaskStatus({ id: task?._id, status: "completed" })
+              }
             />
             <h3
               className={

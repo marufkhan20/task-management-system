@@ -26,6 +26,24 @@ const CreateTask = ({ createTask, setCreateTask }) => {
   const [description, setDescription] = useState();
   const [editableTime, setEditableTime] = useState({});
 
+  // set current date in created on
+  useEffect(() => {
+    if (!createdOn) {
+      const date = new Date();
+      const day =
+        date.getDate()?.toString().length === 1
+          ? `0${date.getDate()}`
+          : date.getDate();
+
+      const month =
+        date.getMonth()?.toString().length === 1
+          ? `0${date.getMonth() + 1}`
+          : date.getMonth;
+      const year = date.getFullYear();
+      setCreatedOn(`${year}-${month}-${day}`);
+    }
+  }, [createdOn]);
+
   // set time now
   const setTimeNow = (time) => {
     setSelectedTime(time);
