@@ -13,18 +13,14 @@ const CreateTask = ({ createTask, setCreateTask }) => {
   const [openTimer, setOpenTimer] = useState(false);
   const [openCategory, setOpenCategory] = useState(false);
   const [openTags, setOpenTags] = useState(false);
-  const [selectedTime, setSelectedTime] = useState({});
 
   // form data state
   const [name, setName] = useState("");
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
-  const [timerType, setTimerType] = useState();
+  const [timer, setTimer] = useState({});
   const [category, setCategory] = useState({});
   const [tags, setTags] = useState("");
   const [createdOn, setCreatedOn] = useState();
   const [description, setDescription] = useState();
-  const [editableTime, setEditableTime] = useState({});
 
   // set current date in created on
   useEffect(() => {
@@ -46,7 +42,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
 
   // set time now
   const setTimeNow = (time) => {
-    setSelectedTime(time);
+    setTimer(time);
     setOpenTimer(false);
   };
 
@@ -69,14 +65,11 @@ const CreateTask = ({ createTask, setCreateTask }) => {
   const submitHandler = () => {
     createNewTask({
       name,
-      startTime,
-      endTime,
+      timer,
       createdOn,
       category,
       tags,
       description,
-      editableTime,
-      timerType,
     });
   };
   return (
@@ -131,23 +124,10 @@ const CreateTask = ({ createTask, setCreateTask }) => {
                   className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left"
                   onClick={() => setOpenTimer(!openTimer)}
                 >
-                  {selectedTime?.startHour
-                    ? `${selectedTime?.startHour} : ${selectedTime?.startMinute} - ${selectedTime?.endHour} : ${selectedTime?.endHour}`
-                    : editableTime?.durationHour
-                    ? `${editableTime?.startMinues} : ${editableTime?.intervals}`
-                    : "Empty"}
+                  Empty
                 </button>
 
-                <SelectTimer
-                  setStartTime={setStartTime}
-                  setEndTime={setEndTime}
-                  openTimer={openTimer}
-                  setOpenTimer={setOpenTimer}
-                  setTimeNow={setTimeNow}
-                  editableTime={editableTime}
-                  setEditableTime={setEditableTime}
-                  setTimerType={setTimerType}
-                />
+                <SelectTimer openTimer={openTimer} setTimeNow={setTimeNow} />
               </div>
             </div>
 

@@ -29,6 +29,12 @@ const TasksContainer = ({
               </h3>
             )}
 
+            {status === "future" && (
+              <h3 className="text-purple-500 font-semibold text-lg">
+                Future tasks ({allTasks?.length})
+              </h3>
+            )}
+
             {status === "completed" && (
               <h3 className="text-success font-semibold text-lg">
                 Completed tasks ({allTasks?.length})

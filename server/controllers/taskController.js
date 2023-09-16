@@ -1,4 +1,3 @@
-const { consumers } = require("nodemailer/lib/xoauth2");
 const Task = require("../models/Task");
 
 // get tasks by category controller
@@ -29,24 +28,132 @@ const getTasksByCategoryController = async (req, res) => {
 // create new task controller
 const createNewTaskController = async (req, res) => {
   try {
-    const {
-      name,
-      startTime,
-      endTime,
-      category,
-      createdOn,
-      tags,
-      description,
-      editableTime,
-      timerType,
-    } = req.body || {};
+    const { name, timer, category, createdOn, tags, description } =
+      req.body || {};
+
+    const { timerType } = timer || {};
 
     const { _id } = req.user || {};
 
+    let startTime = new Date();
+    let endTime = new Date();
+    const intervalsBreakPoints = [];
+
+    if (timerType === "countdown") {
+      const { startTimeHours, startTimeMinutes, endTimeHours, endTimeMinutes } =
+        timer || {};
+
+      startTime.setHours(startTimeHours, startTimeMinutes, 0, 0);
+      endTime.setHours(endTimeHours, endTimeMinutes, 0, 0);
+    } else if (timerType === "stopwatch") {
+      const { stopWatchHours, stopWatchMinutes, stopWatchSeconds } =
+        timer || {};
+
+      const currentTime = new Date();
+
+      console.log("stopwatch hours", Number(stopWatchHours));
+
+      startTime.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes(),
+        0,
+        0
+      );
+      endTime.setHours(
+        currentTime.getHours() + Number(stopWatchHours),
+        currentTime.getMinutes() + Number(stopWatchMinutes),
+        stopWatchSeconds,
+        0
+      );
+    } else if (timerType === "pomodoro") {
+      const {
+        durationHours,
+        durationMinutes,
+        intervals,
+        shortBreakMinutes,
+        shortBreakSeconds,
+        longBreakMinutes,
+        longBreakSeconds,
+      } = timer || {};
+
+      const time = Number(durationHours) * 60 + Number(durationMinutes);
+
+      const breakTime =
+        shortBreakMinutes || shortBreakSeconds
+          ? Number(shortBreakMinutes) + Number(shortBreakSeconds)
+          : Number(longBreakMinutes) + Number(longBreakSeconds);
+
+      const fullTime = time + breakTime * intervals;
+
+      const fullTimeBreakTime = fullTime / intervals;
+
+      for (let i = 1; i <= intervals; i++) {
+        // break start time
+        const breakStartFullTime = fullTimeBreakTime * i - breakTime;
+        const breakStartRemainingMinutes = breakStartFullTime % 60;
+        const totalMinutesForHours =
+          (breakStartFullTime - breakStartRemainingMinutes) / 60;
+
+        const breakStartTime = new Date();
+        startTime.setHours(
+          breakStartTime.getHours() + Number(totalMinutesForHours),
+          breakStartTime.getMinutes() + Number(breakStartRemainingMinutes),
+          0,
+          0
+        );
+
+        // break end time
+        const breakEndFullTime = fullTimeBreakTime * i;
+        const breakEndRemainingMinutes = breakStartFullTime % 60;
+        const totalMinutesForEndHours =
+          (breakEndFullTime - breakEndRemainingMinutes) / 60;
+
+        // console.log("totalMinutesForEndHours", totalMinutesForEndHours);
+
+        // console.log("breakEndRemainingMinutes", breakEndRemainingMinutes);
+
+        const breakEndTime = new Date();
+        breakEndTime.setHours(
+          breakEndTime.getHours() + Number(totalMinutesForEndHours),
+          breakEndTime.getMinutes() + Number(breakEndRemainingMinutes),
+          0,
+          0
+        );
+
+        intervalsBreakPoints.push({
+          breakStart: breakStartTime,
+          breakEnd: breakEndTime,
+        });
+      }
+
+      // convert minute to hours
+      const remainingMinutes = fullTime % 60;
+      const totalMinutesForHours = (fullTime - remainingMinutes) / 60;
+
+      const totalHours = totalMinutesForHours;
+
+      const currentTime = new Date();
+
+      startTime.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes(),
+        0,
+        0
+      );
+      endTime.setHours(
+        currentTime.getHours() + Number(totalHours),
+        currentTime.getMinutes() + Number(remainingMinutes),
+        0,
+        0
+      );
+    }
+
     // generate task status
-    let status;
+    let status = "upcoming";
 
     if (new Date(startTime) > new Date()) {
+      status = "future";
+    } else if (Object.keys(timer)?.length === 0) {
       status = "upcoming";
     } else if (
       new Date(startTime) <= new Date() &&
@@ -68,8 +175,9 @@ const createNewTaskController = async (req, res) => {
       description,
       user: _id,
       status,
-      editableTime,
+      editableTime: timer,
       timerType,
+      intervalsBreakPoints,
     });
 
     await newTask.save();
@@ -102,13 +210,24 @@ const deleteTaskController = async (req, res) => {
 // update task status controller
 const updateTaskStatusController = async (req, res) => {
   try {
-    const { status } = req.body || {};
+    const { status, startTime } = req.body || {};
     const { id } = req.params || {};
-    const updatedTask = await Task.findByIdAndUpdate(
-      id,
-      { $set: { status } },
-      { new: true }
-    );
+    let updatedTask;
+
+    if (startTime) {
+      updatedTask = await Task.findByIdAndUpdate(
+        id,
+        { $set: { status, startTime } },
+        { new: true }
+      );
+    } else {
+      updatedTask = await Task.findByIdAndUpdate(
+        id,
+        { $set: { status } },
+        { new: true }
+      );
+    }
+
     res.status(200).json(updatedTask);
   } catch (err) {
     // console.error(err);

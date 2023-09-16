@@ -2,10 +2,8 @@ const {
   registerController,
   loginController,
   accountVerifyController,
-  // forgotPasswordController,
-  // changePassword,
-  // verifyCodeController,
-  // creatNewPasswordController,
+  getUserByEmailController,
+  resetPasswordController,
 } = require("../controllers/authController");
 
 const router = require("express").Router();
@@ -19,16 +17,10 @@ router.post("/account-verify", accountVerifyController);
 // login route
 router.post("/login", loginController);
 
-// // change password
-// router.patch("/change-password/:userId", changePassword);
+// get user by email
+router.get("/:email", getUserByEmailController);
 
-// // forgot password route
-// router.post("/forgot-password", forgotPasswordController);
-
-// // verify code route
-// router.post("/forgot-password/verify-code", verifyCodeController);
-
-// // create new password route
-// router.post("/forgot-password/create-new-password", creatNewPasswordController);
+// reset account password
+router.put("/reset-password/:token", resetPasswordController);
 
 module.exports = router;

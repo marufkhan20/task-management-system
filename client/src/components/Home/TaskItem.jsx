@@ -58,69 +58,52 @@ const TaskItem = ({
 
   // calculate remaining task time
   useEffect(() => {
-    let taskTime;
-
-    if (taskTime) {
-      clearInterval(taskTime);
-    }
-
     if (task?._id) {
-      taskTime = setInterval(() => {
-        // update task status
-        if (new Date(task?.startTime) > new Date()) {
-          // don't update task status
-        } else if (
-          new Date(task?.startTime) <= new Date() &&
-          new Date(task?.endTime) >= new Date() &&
-          task?.status === "upcoming"
-        ) {
-          updateTaskStatus({ id: task?._id, status: "ongoing" });
-        }
-        // else if (
-        //   new Date() > new Date(task?.endTime) &&
-        //   task?.status !== "completed"
-        // ) {
-        //   updateTaskStatus({ id: task?._id, status: "completed" });
-        // }
+      // update task status
+      if (new Date(task?.startTime) > new Date()) {
+        // don't update task status
+      } else if (
+        new Date(task?.startTime) <= new Date() &&
+        new Date(task?.endTime) >= new Date() &&
+        task?.status === "upcoming"
+      ) {
+        updateTaskStatus({ id: task?._id, status: "ongoing" });
+      }
+      // else if (
+      //   new Date() > new Date(task?.endTime) &&
+      //   task?.status !== "completed"
+      // ) {
+      //   updateTaskStatus({ id: task?._id, status: "completed" });
+      // }
 
-        // Assuming you have start and end times in ISO 8601 format
-        const startTimeStr = task?.startTime;
-        const endTimeStr = task?.endTime;
+      // Assuming you have start and end times in ISO 8601 format
+      const startTimeStr = task?.startTime;
+      const endTimeStr = task?.endTime;
 
-        // Convert the time strings to Date objects
-        const startTime = new Date(startTimeStr);
-        const endTime = new Date(endTimeStr);
+      // Convert the time strings to Date objects
+      const startTime = new Date(startTimeStr);
+      const endTime = new Date(endTimeStr);
 
-        // Get the current time
-        const currentTime = new Date();
+      // Get the current time
+      const currentTime = new Date();
 
-        // Calculate the time difference in milliseconds
-        const timeDifference =
-          task?.timerType === "stopwatch"
-            ? endTime - (currentTime >= startTime ? currentTime : startTime)
-            : endTime - startTime;
+      // Calculate the time difference in milliseconds
+      const timeDifference =
+        task?.timerType === "stopwatch"
+          ? endTime - (currentTime >= startTime ? currentTime : startTime)
+          : endTime - startTime;
 
-        // Convert the time difference to hours, minutes, and seconds
-        const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
-        const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
-        const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
+      // Convert the time difference to hours, minutes, and seconds
+      const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
+      const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
+      const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
 
-        if (task?.timerType === "stopwatch") {
-          setHours(hoursNow);
-          setMinutes(minutesNow);
-          setSeconds(secondsNow);
-        } else {
-          setCompletedTaskTime({
-            hours: hoursNow,
-            minutes: minutesNow,
-            seconds: secondsNow,
-          });
-        }
-      }, 1000);
+      setCompletedTaskTime({
+        hours: hoursNow,
+        minutes: minutesNow,
+        seconds: secondsNow,
+      });
     }
-    return () => {
-      // clearInterval(taskTime);
-    };
   }, [task, allTasksWithStatus]);
 
   // error submit Handler
@@ -140,6 +123,23 @@ const TaskItem = ({
   const deleteSubmitHandler = () => {
     deleteTask(task?._id);
   };
+
+  // update task handler
+  const updateTaskHandler = () => {
+    if (task?.status === "completed") {
+      console.log("completed");
+      updateTaskStatus({ id: task?._id, status: "ongoing" });
+    }
+
+    if (task?.status === "future" || task?.status === "upcoming") {
+      console.log("future || upcoming");
+      updateTaskStatus({
+        id: task?._id,
+        status: "ongoing",
+        startTime: new Date(),
+      });
+    }
+  };
   return (
     <>
       <tr
@@ -153,10 +153,7 @@ const TaskItem = ({
             checked={task?.status === "completed"}
             name=""
             id=""
-            onChange={() =>
-              task?.status === "completed" &&
-              updateTaskStatus({ id: task?._id, status: "ongoing" })
-            }
+            onChange={updateTaskHandler}
           />
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
@@ -188,9 +185,11 @@ const TaskItem = ({
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
           {task?.timerType === "stopwatch" &&
-            `${hours}h ${minutes}m ${seconds}s`}
+            `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
 
           {status === "upcoming" && "N/A"}
+
+          {status === "future" && "N/A"}
 
           {status === "completed" &&
             `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}

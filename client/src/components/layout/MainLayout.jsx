@@ -6,7 +6,7 @@ import Sidebar from "../shared/Sidebar";
 const MainLayout = ({ category, setCategory, children }) => {
   const [showSidebar, setShowSidebar] = useState(false);
   return (
-    <div className="md:flex md:justify-between w-full">
+    <div className="md:flex md:justify-between w-full min-h-screen">
       <div
         className={`w-full md:w-[248px] transition-all duration-500 fixed top-0 ${
           showSidebar ? "left-0" : "-left-[200%] md:left-0"

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BsChevronDown, BsFolder2 } from "react-icons/bs";
 import { CgFileDocument } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
 import { GrClose } from "react-icons/gr";
 import { HiOutlineFolder } from "react-icons/hi2";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "../../features/auth/authSlice";
 import { useGetCategoriesByUserQuery } from "../../features/category/categoryApi";
 import CreateCategory from "../Home/CreateCategory";
 import CreateTask from "../Home/CreateTask";
@@ -15,8 +19,11 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
   const [createTask, setCreateTask] = useState(false);
   const [createCategory, setCreateCategory] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [logoutOpt, setLogoutOpt] = useState(false);
 
   const [showCrateOpt, setShowCreateOpt] = useState(false);
+
+  const dispatch = useDispatch();
 
   // get all categories
   const { data } = useGetCategoriesByUserQuery();
@@ -26,13 +33,41 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
       setCategories(data);
     }
   }, [data]);
+
+  // logout handler
+  const logoutHandler = () => {
+    dispatch(userLoggedOut());
+    toast.success("Logged out successfully");
+    setLogoutOpt(false);
+  };
   return (
     <>
       <div className="bg-light-bg min-h-full py-8 flex flex-col gap-6 z-50">
-        <div className="hidden md:flex items-center gap-2 font-semibold text-heading px-[18px]">
-          <img src="/img/avatar.png" alt="user" />
-          <span>John Doe</span>
-          <BsChevronDown />
+        <div className="relative">
+          <div
+            className={`hidden md:flex items-center gap-2 font-semibold text-heading px-[18px] cursor-pointer transition-all ${
+              logoutOpt ? "bg-white" : "hover:bg-white"
+            } py-2`}
+            onClick={() => setLogoutOpt(!logoutOpt)}
+          >
+            <img src="/img/avatar.png" alt="user" />
+            <span>John Doe</span>
+            <BsChevronDown />
+          </div>
+
+          <div
+            className={`absolute top-14 transition-all duration-300 ${
+              logoutOpt ? "left-2 right-2" : "-left-[150%]"
+            }  bg-white box-shadow p-2 rounded-lg`}
+          >
+            <button
+              className="p-[10px] flex items-center gap-2 text-alert justify-center w-full border border-alert rounded-lg transition-all hover:bg-alert hover:text-white font-semibold"
+              onClick={logoutHandler}
+            >
+              <FiLogOut />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
 
         <div className="hidden md:block px-[18px]">

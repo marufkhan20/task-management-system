@@ -1,175 +1,116 @@
 import React, { useEffect, useState } from "react";
 
-const SelectTimer = ({
-  setTimeNow,
-  openTimer,
-  setStartTime,
-  setEndTime,
-  setEditableTime,
-  setTimerType,
-}) => {
+const SelectTimer = ({ setTimeNow, openTimer }) => {
   const [selectOpt, setSelectOpt] = useState("countdown");
+  const [timerType, setTimerType] = useState("countdownn");
 
-  // Set custom timer state and functionlities
-  const [startHour, setStartHour] = useState(new Date().getHours());
-  const [startMinute, setStartMinute] = useState(new Date().getMinutes());
-  const [endHour, setEndHour] = useState();
-  const [endMinute, setEndMinute] = useState();
+  // custom timer state
+  const [startTimeHours, setStartTimeHours] = useState(new Date().getHours());
+  const [startTimeMinutes, setStartTimeMinutes] = useState(
+    new Date().getMinutes()
+  );
+  const [endTimeHours, setEndTimeHours] = useState();
+  const [endTimeMinutes, setEndTimeMinutes] = useState();
 
-  // Convert Input to Actual Time
-  useEffect(() => {
-    if (startHour && startMinute) {
-      const startTime = new Date();
-      startTime.setHours(startHour, startMinute, 0, 0);
-      setStartTime(startTime);
-    }
-
-    if (endHour && endMinute) {
-      const endTime = new Date();
-      endTime.setHours(endHour, endMinute, 0, 0);
-      setEndTime(endTime);
-    }
-
-    // set editable time
-    setEditableTime({
-      startHour,
-      startMinute,
-      endHour,
-      endMinute,
-    });
-  }, [
-    startHour,
-    startMinute,
-    endHour,
-    endMinute,
-    setStartTime,
-    setEndTime,
-    setEditableTime,
-  ]);
-
-  // set stop watch timer state and functionlities
+  // stop watch state
   const [stopWatchHours, setStopWatchHours] = useState();
   const [stopWatchMinutes, setStopWatchMinutes] = useState();
   const [stopWatchSeconds, setStopWatchSeconds] = useState();
-  const [stopwatchMode, setStopWatchMode] = useState(false);
 
-  // Convert Input to Actual Time
-  useEffect(() => {
-    if (stopWatchHours || stopWatchMinutes || stopWatchSeconds) {
-      setStopWatchMode(true);
-    } else {
-      setStopWatchMode(false);
-    }
-
-    if (stopWatchHours && stopWatchMinutes && stopWatchSeconds) {
-      const startTime = new Date();
-      startTime.setHours(
-        startTime?.getHours(),
-        startTime?.getMinutes(),
-        startTime.getSeconds(),
-        0
-      );
-      setStartTime(startTime);
-
-      const endTime = new Date();
-      endTime.setHours(
-        startTime.getHours() + Number(stopWatchHours),
-        startTime.getMinutes() + Number(stopWatchMinutes),
-        startTime.getSeconds() + Number(stopWatchSeconds),
-        0
-      );
-      setEndTime(endTime);
-    }
-
-    // set editable time
-    setEditableTime({
-      stopWatchHours,
-      stopWatchMinutes,
-      stopWatchSeconds,
-    });
-  }, [
-    startHour,
-    startMinute,
-    endHour,
-    endMinute,
-    setStartTime,
-    setEndTime,
-    setEditableTime,
-    stopWatchHours,
-    stopWatchMinutes,
-    stopWatchSeconds,
-  ]);
-
-  // set pomodoro timer state and functionlities
-  const [durationHour, setDurationHour] = useState();
-  const [durationMinute, setDurationMinute] = useState();
+  // pomodoro timer state
+  const [durationHours, setDurationHours] = useState();
+  const [durationMinutes, setDurationMinutes] = useState();
   const [intervals, setIntervals] = useState();
   const [shortBreakMinutes, setShortBreakMinutes] = useState();
   const [shortBreakSeconds, setShortBreakSeconds] = useState();
   const [longBreakMinutes, setLongBreakMinutes] = useState();
   const [longBreakSeconds, setLongBreakSeconds] = useState();
-  const [breakError, setBreakError] = useState();
+  const [pomodorErrors, setPomodorErrors] = useState({});
 
+  // when timer option state change
+  useEffect(() => {
+    if (selectOpt === "countdown") {
+      setStopWatchHours();
+      setStopWatchMinutes();
+      setStopWatchSeconds();
+      setDurationHours();
+      setDurationMinutes();
+      setIntervals();
+      setShortBreakMinutes();
+      setShortBreakSeconds();
+      setLongBreakMinutes();
+      setLongBreakSeconds();
+    } else if (selectOpt === "stopwatch") {
+      setEndTimeHours();
+      setEndTimeMinutes();
+      setDurationHours();
+      setDurationMinutes();
+      setIntervals();
+      setShortBreakMinutes();
+      setShortBreakSeconds();
+      setLongBreakMinutes();
+      setLongBreakSeconds();
+    } else if (selectOpt === "pomodoro") {
+      setEndTimeHours();
+      setEndTimeMinutes();
+      setStopWatchHours();
+      setStopWatchMinutes();
+      setStopWatchSeconds();
+    }
+  }, [selectOpt]);
+
+  // set timer type
+  useEffect(() => {
+    setTimerType(selectOpt);
+  }, [selectOpt]);
+
+  // when user set stopwatch time then select option change
+  useEffect(() => {
+    if (stopWatchHours || stopWatchMinutes || stopWatchSeconds) {
+      setTimerType("stopwatch");
+    } else {
+      setTimerType("countdown");
+    }
+  }, [stopWatchHours, stopWatchMinutes, stopWatchSeconds]);
+
+  // user select only long break or short break
   useEffect(() => {
     if (
-      (shortBreakMinutes || shortBreakSeconds) &&
-      (longBreakMinutes || longBreakSeconds)
+      (longBreakMinutes || longBreakSeconds) &&
+      (shortBreakMinutes || shortBreakSeconds)
     ) {
-      setBreakError("Please select one break.");
+      setPomodorErrors("You can only select long break or short break");
     } else {
-      setBreakError("");
+      setPomodorErrors("");
     }
   }, [
-    shortBreakMinutes,
-    shortBreakSeconds,
     longBreakMinutes,
     longBreakSeconds,
-    breakError,
+    shortBreakMinutes,
+    shortBreakSeconds,
   ]);
 
-  // Convert Input to Actual Time
-  useEffect(() => {
-    if (durationHour && durationMinute) {
-      const startTime = new Date();
-      startTime.setHours(startTime?.getHours(), startTime?.getMinutes(), 0, 0);
-      setStartTime(startTime);
-
-      const endTime = new Date();
-      endTime.setHours(
-        startTime.getHours() + Number(durationHour),
-        startTime.getMinutes() + Number(durationMinute),
-        0,
-        0
-      );
-      setEndTime(endTime);
-    }
-
-    // set editable time
-    setEditableTime({
-      durationHour,
-      durationMinute,
+  // set now handler
+  const setNowHandler = () => {
+    console.log("seconds", longBreakSeconds);
+    setTimeNow({
+      timerType,
+      startTimeHours,
+      startTimeMinutes,
+      endTimeHours,
+      endTimeMinutes,
+      stopWatchHours,
+      stopWatchMinutes,
+      stopWatchSeconds,
+      durationHours,
+      durationMinutes,
+      intervals: Number(intervals),
       shortBreakMinutes,
       shortBreakSeconds,
       longBreakMinutes,
       longBreakSeconds,
-      intervals,
     });
-  }, [
-    startHour,
-    startMinute,
-    endHour,
-    endMinute,
-    setStartTime,
-    setEndTime,
-    setEditableTime,
-    durationHour,
-    durationMinute,
-    shortBreakMinutes,
-    shortBreakSeconds,
-    longBreakMinutes,
-    longBreakSeconds,
-    intervals,
-  ]);
+  };
   return (
     <div
       className={`transition-all duration-500 ${
@@ -222,16 +163,16 @@ const SelectTimer = ({
                         type="text"
                         placeholder="15"
                         className="outline-none w-8 text-center"
-                        value={startHour}
-                        onChange={(e) => setStartHour(e.target.value)}
+                        value={startTimeHours}
+                        onChange={(e) => setStartTimeHours(e.target.value)}
                       />
                       <span>:</span>
                       <input
                         type="text"
                         placeholder="10"
                         className="outline-none w-8 text-center"
-                        value={startMinute}
-                        onChange={(e) => setStartMinute(e.target.value)}
+                        value={startTimeMinutes}
+                        onChange={(e) => setStartTimeMinutes(e.target.value)}
                       />
                     </div>
                   </div>
@@ -246,16 +187,16 @@ const SelectTimer = ({
                         type="text"
                         placeholder="00"
                         className="outline-none w-8 text-center"
-                        value={endHour}
-                        onChange={(e) => setEndHour(e.target.value)}
+                        value={endTimeHours}
+                        onChange={(e) => setEndTimeHours(e.target.value)}
                       />
                       <span>:</span>
                       <input
                         type="text"
                         placeholder="00"
                         className="outline-none w-8 text-center"
-                        value={endMinute}
-                        onChange={(e) => setEndMinute(e.target.value)}
+                        value={endTimeMinutes}
+                        onChange={(e) => setEndTimeMinutes(e.target.value)}
                       />
                     </div>
                   </div>
@@ -325,10 +266,9 @@ const SelectTimer = ({
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
+                  checked={timerType === "stopwatch"}
                   name=""
                   id="stopwatch"
-                  checked={stopwatchMode}
-                  onChange={() => setStopWatchMode(!stopwatchMode)}
                 />
                 <label
                   htmlFor="stopwatch"
@@ -361,16 +301,16 @@ const SelectTimer = ({
                         type="text"
                         placeholder="15"
                         className="outline-none w-8 text-center"
-                        value={durationHour}
-                        onChange={(e) => setDurationHour(e.target.value)}
+                        value={durationHours}
+                        onChange={(e) => setDurationHours(e.target.value)}
                       />
                       <span>:</span>
                       <input
                         type="text"
                         placeholder="10"
                         className="outline-none w-8 text-center"
-                        value={durationMinute}
-                        onChange={(e) => setDurationMinute(e.target.value)}
+                        value={durationMinutes}
+                        onChange={(e) => setDurationMinutes(e.target.value)}
                       />
                     </div>
                   </div>
@@ -452,47 +392,20 @@ const SelectTimer = ({
               </div>
             </div>
           </div>
-          {breakError && (
-            <p className="mb-2 text-center text-red-500">{breakError}</p>
+          {pomodorErrors && (
+            <p className="text-center text-red-500 mb-3">{pomodorErrors}</p>
           )}
         </div>
       )}
 
       {/* footer */}
       <div className="px-5 py-4 flex items-center justify-between  border-t border-light-secondary">
-        <button
-          className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white"
-          onClick={() => {
-            setTimeNow({
-              startHour,
-              startMinute,
-              endHour,
-              endMinute,
-            });
-            setTimerType(
-              stopWatchHours || stopWatchMinutes || stopWatchSeconds
-                ? "stopwatch"
-                : selectOpt
-            );
-          }}
-        >
+        <button className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white">
           Schedule for later
         </button>
         <button
           className="font-semibold p-[10px] border border-secondary rounded-lg bg-secondary text-white transition-all hover:text-heading hover:bg-transparent"
-          onClick={() => {
-            setTimeNow({
-              startHour,
-              startMinute,
-              endHour,
-              endMinute,
-            });
-            setTimerType(
-              stopWatchHours || stopWatchMinutes || stopWatchSeconds
-                ? "stopwatch"
-                : selectOpt
-            );
-          }}
+          onClick={setNowHandler}
         >
           Set Now
         </button>

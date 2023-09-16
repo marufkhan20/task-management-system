@@ -3,7 +3,10 @@ import Tasks from "../components/Home/Tasks";
 import MainLayout from "../components/layout/MainLayout";
 
 const Home = () => {
-  const [category, setCategory] = useState({});
+  const [category, setCategory] = useState({
+    _id: "all-tasks",
+    title: "All Tasks",
+  });
 
   useEffect(() => {
     console.log(category);

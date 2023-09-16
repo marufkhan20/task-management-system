@@ -42,28 +42,6 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    changePassword: builder.mutation({
-      query: ({ data, userId }) => ({
-        url: `/api/auth/change-password/${userId}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    forgotPassword: builder.mutation({
-      query: (data) => ({
-        url: "/api/auth/forgot-password",
-        method: "POST",
-        body: data,
-      }),
-      async onQueryStarted(args, { queryFulfilled, dispatch }) {
-        const res = await queryFulfilled;
-        const { data } = res || {};
-        const { token } = data || {};
-
-        // set local storage
-        localStorage.setItem("verifyToken", token);
-      },
-    }),
     accountVerify: builder.mutation({
       query: (data) => ({
         url: "/api/auth/account-verify",
@@ -71,11 +49,16 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    createNewPassword: builder.mutation({
-      query: (data) => ({
-        url: "/api/auth/forgot-password/create-new-password",
-        method: "POST",
-        body: data,
+    getUserByEmail: builder.query({
+      query: (email) => `/api/auth/${email}`,
+    }),
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: `/api/auth/reset-password/${token}`,
+        method: "PUT",
+        body: {
+          password,
+        },
       }),
     }),
   }),
@@ -84,8 +67,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
-  useChangePasswordMutation,
-  useForgotPasswordMutation,
   useAccountVerifyMutation,
-  useCreateNewPasswordMutation,
+  useGetUserByEmailQuery,
+  useResetPasswordMutation,
 } = authApi;

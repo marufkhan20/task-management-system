@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineClose, AiOutlinePause } from "react-icons/ai";
 import { BsHourglassTop } from "react-icons/bs";
+import { FiPlay } from "react-icons/fi";
 import { IoCheckmarkSharp, IoReloadSharp } from "react-icons/io5";
 import { PiTimer } from "react-icons/pi";
 import { useUpdateTaskStatusMutation } from "../../features/task/taskApi";
@@ -20,6 +21,8 @@ const CurrentTask = ({
   const [hours, setHours] = useState("00");
   const [minutes, setMinutes] = useState("00");
   const [seconds, setSeconds] = useState("00");
+  const [taskBreak, setTaskBreak] = useState();
+  const [pause, setPause] = useState(false);
 
   // calculate remaining task time
   useEffect(() => {
@@ -31,7 +34,11 @@ const CurrentTask = ({
       clearInterval(taskRemainingTime);
     }
 
-    if (currentActiveTask?._id) {
+    if (pause) {
+      clearInterval(taskRemainingTime);
+    }
+
+    if (currentActiveTask?._id && !pause) {
       taskRemainingTime = setInterval(() => {
         // Assuming you have start and end times in ISO 8601 format
         const startTimeStr = currentActiveTask?.startTime;
@@ -45,24 +52,55 @@ const CurrentTask = ({
         const currentTime = new Date();
 
         // Calculate the time difference in milliseconds
-        const timeDifference =
-          endTime - (currentTime >= startTime ? currentTime : startTime);
+        let timeDifference;
+
+        if (currentActiveTask?.timerType === "stopwatch") {
+          timeDifference = startTime + currentTime;
+        } else {
+          timeDifference =
+            endTime - (currentTime >= startTime ? currentTime : startTime);
+        }
 
         // Convert the time difference to hours, minutes, and seconds
         const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
         const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
         const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
 
-        setHours(hoursNow);
-        setMinutes(minutesNow);
-        setSeconds(secondsNow);
+        if (currentActiveTask?.timerType === "pomodoro") {
+          currentActiveTask?.intervalsBreakPoints?.forEach((item) => {
+            // console.log(
+            //   "item",
+            //   new Date(item?.breakStart) >= new Date() &&
+            //     new Date(item?.breakEnd) <= new Date()
+            // );
+            if (
+              new Date() >= new Date(item?.breakStart) &&
+              new Date() <= new Date(item?.breakEnd)
+            ) {
+              console.log("work");
+              setTaskBreak(
+                `This is task break for ${
+                  currentActiveTask?.longBreakMinutes
+                    ? currentActiveTask?.longBreakMinutes
+                    : currentActiveTask?.shortBreakMinutes
+                } minutes`
+              );
+            }
+          });
+        }
+
+        if (!taskBreak) {
+          setHours(hoursNow);
+          setMinutes(minutesNow);
+          setSeconds(secondsNow);
+        }
       }, 1000);
 
       return () => {
         clearInterval(taskRemainingTime);
       };
     }
-  }, [currentActiveTask, preventTask]);
+  }, [currentActiveTask, preventTask, pause]);
 
   const { _id, name, description, tags } = currentActiveTask || {};
 
@@ -147,10 +185,23 @@ const CurrentTask = ({
               <span>Restart</span>
             </button>
             <div className="flex flex-col gap-4">
-              <button className="flex items-center gap-4 py-2 px-3 rounded bg-warning text-white font-medium cursor-pointer transition-all hover:bg-warning/70">
-                <AiOutlinePause />
-                <span>Pause</span>
-              </button>
+              {!pause ? (
+                <button
+                  className="flex items-center gap-4 py-2 px-3 rounded bg-warning text-white font-medium cursor-pointer transition-all hover:bg-warning/70"
+                  onClick={() => setPause(true)}
+                >
+                  <AiOutlinePause />
+                  <span>Pause</span>
+                </button>
+              ) : (
+                <button
+                  className="flex items-center gap-4 py-2 px-3 rounded bg-green-500 text-white font-medium cursor-pointer transition-all hover:bg-green-500/70"
+                  onClick={() => setPause(false)}
+                >
+                  <FiPlay />
+                  <span>Start</span>
+                </button>
+              )}
               <button
                 className="flex items-center gap-4 py-2 px-3 rounded bg-success text-white font-medium cursor-pointer transition-all hover:bg-success/70"
                 onClick={completeTask}

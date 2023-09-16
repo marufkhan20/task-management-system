@@ -67,6 +67,7 @@ const Tasks = ({ category }) => {
   const completedTasks = allTasks?.filter(
     (item) => item?.status === "completed"
   );
+  const futureTasks = allTasks?.filter((item) => item?.status === "future");
   return (
     <div>
       <TaskHeader category={category} />
@@ -106,6 +107,16 @@ const Tasks = ({ category }) => {
           </button>
           <button
             className={`transition-all duration-300 w-full pb-[10px] border-b-2 ${
+              selectedTaskStatus === "future"
+                ? "font-bold text-[#4A3093] border-[#4A3093]"
+                : "font-medium text-[#373D3F] border-transparent"
+            }`}
+            onClick={() => setSelectedTaskStatus("future")}
+          >
+            Future ({futureTasks?.length})
+          </button>
+          <button
+            className={`transition-all duration-300 w-full pb-[10px] border-b-2 ${
               selectedTaskStatus === "completed"
                 ? "font-bold text-[#4A3093] border-[#4A3093]"
                 : "font-medium text-[#373D3F] border-transparent"
@@ -133,6 +144,17 @@ const Tasks = ({ category }) => {
               status="upcoming"
               setCurrentActiveTask={currentActiveTaskHandler}
               allTasks={upcomingTasks}
+              setAllTasks={setAllTasks}
+              currentActiveTask={currentActiveTask}
+              allTasksWithStatus={allTasks}
+            />
+          )}
+
+          {selectedTaskStatus === "future" && futureTasks?.length > 0 && (
+            <TasksContainer
+              status="future"
+              setCurrentActiveTask={currentActiveTaskHandler}
+              allTasks={futureTasks}
               setAllTasks={setAllTasks}
               currentActiveTask={currentActiveTask}
               allTasksWithStatus={allTasks}
@@ -169,6 +191,16 @@ const Tasks = ({ category }) => {
             status="upcoming"
             setCurrentActiveTask={currentActiveTaskHandler}
             allTasks={upcomingTasks}
+            setAllTasks={setAllTasks}
+            currentActiveTask={currentActiveTask}
+            allTasksWithStatus={allTasks}
+          />
+        )}
+        {futureTasks?.length > 0 && (
+          <TasksContainer
+            status="future"
+            setCurrentActiveTask={currentActiveTaskHandler}
+            allTasks={futureTasks}
             setAllTasks={setAllTasks}
             currentActiveTask={currentActiveTask}
             allTasksWithStatus={allTasks}
