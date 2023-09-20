@@ -4,6 +4,8 @@ const {
   deleteTaskController,
   updateTaskStatusController,
   updateTaskController,
+  restartTaskController,
+  startTaskController,
 } = require("../controllers/taskController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -26,6 +28,13 @@ router.put(
   updateTaskStatusController
 );
 
+// start task
+router.put("/start-task/:id", authMiddleware, startTaskController);
+
+// restart task
+router.put("/restart-task/:id", authMiddleware, restartTaskController);
+
+// update task
 router.put("/:id", authMiddleware, updateTaskController);
 
 module.exports = router;

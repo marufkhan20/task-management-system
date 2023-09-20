@@ -34,6 +34,19 @@ export const taskApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    startTask: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/api/task/start-task/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
+    restartTask: builder.mutation({
+      query: (id) => ({
+        url: `/api/task/restart-task/${id}`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
@@ -43,4 +56,6 @@ export const {
   useDeleteTaskMutation,
   useUpdateTaskStatusMutation,
   useUpdateTaskMutation,
+  useStartTaskMutation,
+  useRestartTaskMutation,
 } = taskApi;

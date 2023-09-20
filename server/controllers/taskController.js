@@ -255,10 +255,123 @@ const updateTaskController = async (req, res) => {
   }
 };
 
+// start task controller
+const startTaskController = async (req, res) => {
+  try {
+    const { id } = req.params || {};
+    const { pauseStartTime, pauseEndTime } = req.body || {};
+
+    const task = await Task.findById(id);
+
+    if (task?._id) {
+      let startTime = new Date(task?.startTime);
+      let endTime = new Date(task?.endTime);
+      console.log(startTime);
+
+      const pauseStartTimeNow = new Date(pauseStartTime);
+      const pauseEndTimeNow = new Date(pauseEndTime);
+
+      // get the difference between puase start time and puase end time
+      const hoursDifference =
+        pauseEndTimeNow.getHours() - pauseStartTimeNow.getHours();
+      const minutesDifference =
+        pauseEndTimeNow.getMinutes() - pauseStartTimeNow.getMinutes();
+      const secondsDifference =
+        pauseEndTimeNow.getSeconds() - pauseStartTimeNow.getSeconds();
+      const miliSecondsDifference =
+        pauseEndTimeNow.getMilliseconds() - pauseStartTimeNow.getMilliseconds();
+
+      // plus the pause diffrence time in start time
+      startTime = startTime.setHours(
+        startTime.getHours() + hoursDifference,
+        startTime.getMinutes() + minutesDifference,
+        startTime.getSeconds() + secondsDifference,
+        startTime.getMilliseconds() + miliSecondsDifference
+      );
+
+      // plus the pause diffrence time in end time
+      endTime = endTime.setHours(
+        endTime.getHours() + hoursDifference,
+        endTime.getMinutes() + minutesDifference,
+        endTime.getSeconds() + secondsDifference,
+        endTime.getMilliseconds() + miliSecondsDifference
+      );
+
+      task.startTime = startTime;
+      task.endTime = endTime;
+      await task.save();
+
+      res.status(200).json(task);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Server error occurred!",
+    });
+  }
+};
+
+// restart task controller
+const restartTaskController = async (req, res) => {
+  try {
+    const { id } = req.params || {};
+    const task = await Task.findById(id);
+
+    if (task?._id) {
+      const startTime = new Date(task?.startTime);
+      const endTime = new Date(task?.endTime);
+
+      // Calculate the time difference in milliseconds
+      const timeDifference = endTime - startTime;
+
+      // Convert the time difference to hours, minutes, and seconds
+      const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
+      const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
+      const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
+      console.log("hours now", hoursNow);
+
+      // set new time
+      const endCurrentTime = new Date();
+      endCurrentTime.setHours(
+        endCurrentTime.getHours() + hoursNow,
+        endCurrentTime.getMinutes() + minutesNow,
+        endCurrentTime.getSeconds() + secondsNow,
+        0
+      );
+
+      const currentDate = new Date();
+
+      currentDate.setHours(
+        currentDate.getHours(),
+        currentDate.getMinutes(),
+        currentDate.getSeconds(),
+        0
+      );
+
+      console.log("currentDate", currentDate);
+      console.log("endCurrentTime", endCurrentTime);
+
+      task.startTime = currentDate;
+      task.endTime = endCurrentTime;
+
+      await task.save();
+
+      res.status(200).json(task);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Server error occurred!",
+    });
+  }
+};
+
 module.exports = {
   getTasksByCategoryController,
   createNewTaskController,
   deleteTaskController,
   updateTaskStatusController,
   updateTaskController,
+  startTaskController,
+  restartTaskController,
 };
