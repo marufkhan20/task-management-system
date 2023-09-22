@@ -101,6 +101,10 @@ li {
   background-color: #888;
 }
 
+.category:hover .icon {
+  opacity: 1 !important;
+}
+
 /* CSS for screens with a maximum width of 767 pixels (typically for mobile devices) */
 @media screen and (max-width: 768px) {
   /* Your mobile-specific styles go here */

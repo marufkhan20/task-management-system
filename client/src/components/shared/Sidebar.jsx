@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlinePlus } from "react-icons/ai";
-import { BsChevronDown, BsFolder2 } from "react-icons/bs";
+import { BsChevronDown, BsFolder2, BsThreeDotsVertical } from "react-icons/bs";
 import { CgFileDocument } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
@@ -154,7 +154,7 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
               ? categories?.map((item) => (
                   <li
                     key={item?._id}
-                    className={`flex items-center gap-4 font-semibold py-[10px] px-[18px] transition-all hover:bg-white cursor-pointer ${
+                    className={`flex items-center gap-4 category font-semibold py-[10px] px-[18px] transition-all hover:bg-white cursor-pointer  justify-between ${
                       category?._id === item?._id && "bg-white"
                     }`}
                     onClick={() => {
@@ -162,11 +162,14 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
                       setShowSidebar(false);
                     }}
                   >
-                    <HiOutlineFolder
-                      className={`text-lg`}
-                      color={item?.color}
-                    />
-                    <span color={item?.color}>{item?.title}</span>
+                    <div className="flex items-center gap-4">
+                      <HiOutlineFolder
+                        className={`text-lg`}
+                        color={item?.color}
+                      />
+                      <span color={item?.color}>{item?.title}</span>
+                    </div>
+                    <BsThreeDotsVertical className="icon opacity-0" />
                   </li>
                 ))
               : categories.slice(0, 5)?.map((item) => (

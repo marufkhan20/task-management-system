@@ -29,6 +29,7 @@ const CurrentTask = ({
   const [seconds, setSeconds] = useState("00");
   const [pauseStartTime, setPauseStartTime] = useState("");
   const [breakTime, setBreakTime] = useState();
+  const [breakTimeMsg, setBreakTimeMsg] = useState("");
 
   let taskRemainingTime;
 
@@ -175,6 +176,33 @@ const CurrentTask = ({
         const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
         const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
         const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
+
+        if (breakTime) {
+          let timeDifference;
+
+          timeDifference = new Date() - new Date(currentActiveTask?.breakStart);
+
+          // const breakStart = new Date(currentActiveTask?.breakStart);
+          const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
+
+          const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
+
+          if (minutesNow <= currentActiveTask?.shortBreakMinutes) {
+            setBreakTimeMsg(
+              `Now Short Break For ${
+                currentActiveTask?.shortBreakMinutes
+              } Minutes --
+              ${minutesNow || "00"}m ${secondsNow || "00"}s`
+            );
+          } else {
+            setBreakTimeMsg(
+              `Now Long Break For ${
+                currentActiveTask?.longBreakMinutes
+              } Minutes -- 
+              ${minutesNow || "00"}m ${secondsNow || "00"}s`
+            );
+          }
+        }
 
         if (!breakTime) {
           setHours(hoursNow);
@@ -369,7 +397,7 @@ const CurrentTask = ({
 
           {breakTime && (
             <p className="text-lg mt-3 font-medium text-center">
-              Now It's Break Time
+              {breakTimeMsg}
             </p>
           )}
         </div>

@@ -95,22 +95,23 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   const setNowHandler = () => {
     setTimeNow({
       timerType,
-      startTimeHours,
-      startTimeMinutes,
-      endTimeHours,
-      endTimeMinutes,
-      stopWatchHours,
-      stopWatchMinutes,
-      stopWatchSeconds,
-      durationHours,
-      durationMinutes,
+      startTimeHours: startTimeHours || 0,
+      startTimeMinutes: startTimeMinutes || 0,
+      endTimeHours: endTimeHours || 0,
+      endTimeMinutes: endTimeMinutes || 0,
+      stopWatchHours: stopWatchHours || 0,
+      stopWatchMinutes: stopWatchMinutes || 0,
+      stopWatchSeconds: stopWatchSeconds || 0,
+      durationHours: durationHours || 0,
+      durationMinutes: durationMinutes || 0,
       intervals: Number(intervals),
-      shortBreakMinutes,
-      shortBreakSeconds,
-      longBreakMinutes,
-      longBreakSeconds,
-      countDownHours,
-      countDownMinutes,
+      shortBreakMinutes: shortBreakMinutes || 0,
+      shortBreakSeconds: shortBreakSeconds || 0,
+      longBreakMinutes: longBreakMinutes || 0,
+      longBreakSeconds: longBreakSeconds || 0,
+      countDownHours: countDownHours || 0,
+      countDownMinutes: countDownMinutes || 0,
+      scheduleForLater: false,
     });
   };
   return (
@@ -408,7 +409,10 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
 
       {/* footer */}
       <div className="px-5 py-4 flex items-center justify-between  border-t border-light-secondary">
-        <button className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white">
+        <button
+          className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white"
+          onClick={() => setTimeNow({ scheduleForLater: true })}
+        >
           Schedule for later
         </button>
         <button
