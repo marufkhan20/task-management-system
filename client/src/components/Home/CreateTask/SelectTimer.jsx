@@ -11,6 +11,9 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   );
   const [endTimeHours, setEndTimeHours] = useState();
   const [endTimeMinutes, setEndTimeMinutes] = useState();
+  const [countDownHours, setCountDownHours] = useState();
+  const [countDownMinutes, setCountDownMinutes] = useState();
+  const [countdownErrors, setCountdownErrors] = useState("");
 
   // stop watch state
   const [stopWatchHours, setStopWatchHours] = useState();
@@ -25,7 +28,6 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   const [shortBreakSeconds, setShortBreakSeconds] = useState();
   const [longBreakMinutes, setLongBreakMinutes] = useState();
   const [longBreakSeconds, setLongBreakSeconds] = useState();
-  const [pomodorErrors, setPomodorErrors] = useState({});
 
   // when timer option state change
   useEffect(() => {
@@ -50,12 +52,16 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
       setShortBreakSeconds();
       setLongBreakMinutes();
       setLongBreakSeconds();
+      setCountDownHours();
+      setCountDownMinutes();
     } else if (selectOpt === "pomodoro") {
       setEndTimeHours();
       setEndTimeMinutes();
       setStopWatchHours();
       setStopWatchMinutes();
       setStopWatchSeconds();
+      setCountDownHours();
+      setCountDownMinutes();
     }
   }, [selectOpt]);
 
@@ -63,6 +69,18 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   useEffect(() => {
     setTimerType(selectOpt);
   }, [selectOpt]);
+
+  // user select only countdown or duration
+  useEffect(() => {
+    if (
+      (endTimeHours || endTimeMinutes) &&
+      (countDownHours || countDownMinutes)
+    ) {
+      setCountdownErrors("Please select custom time or countdown");
+    } else {
+      setCountdownErrors("");
+    }
+  }, [countDownHours, countDownMinutes, endTimeHours, endTimeMinutes]);
 
   // when user set stopwatch time then select option change
   useEffect(() => {
@@ -73,26 +91,8 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
     }
   }, [stopWatchHours, stopWatchMinutes, stopWatchSeconds]);
 
-  // user select only long break or short break
-  useEffect(() => {
-    if (
-      (longBreakMinutes || longBreakSeconds) &&
-      (shortBreakMinutes || shortBreakSeconds)
-    ) {
-      setPomodorErrors("You can only select long break or short break");
-    } else {
-      setPomodorErrors("");
-    }
-  }, [
-    longBreakMinutes,
-    longBreakSeconds,
-    shortBreakMinutes,
-    shortBreakSeconds,
-  ]);
-
   // set now handler
   const setNowHandler = () => {
-    console.log("seconds", longBreakSeconds);
     setTimeNow({
       timerType,
       startTimeHours,
@@ -109,6 +109,8 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
       shortBreakSeconds,
       longBreakMinutes,
       longBreakSeconds,
+      countDownHours,
+      countDownMinutes,
     });
   };
   return (
@@ -202,7 +204,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                   </div>
                 </div>
               </div>
-              {/* <span className="mt-8">Or</span>
+              <span className="mt-8">Or</span>
               <div>
                 <h3 className="mb-5">Set a countdown</h3>
                 <div className="flex items-center gap-3">
@@ -212,18 +214,27 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                         type="text"
                         placeholder="15"
                         className="outline-none w-8 text-center"
+                        value={countDownHours}
+                        onChange={(e) => setCountDownHours(e.target.value)}
                       />
                       <span>:</span>
                       <input
                         type="text"
                         placeholder="10"
                         className="outline-none w-8 text-center"
+                        value={countDownMinutes}
+                        onChange={(e) => setCountDownMinutes(e.target.value)}
                       />
                     </div>
                   </div>
                 </div>
-              </div> */}
+              </div>
             </div>
+            {countdownErrors && (
+              <p className="text-center text-red-500 mb-3 mt-3">
+                {countdownErrors}
+              </p>
+            )}
           </div>
           <div className="my-6 px-5 text-center">
             <span className="font-medium px-2 bg-white">And/Or</span>
@@ -392,9 +403,6 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
               </div>
             </div>
           </div>
-          {pomodorErrors && (
-            <p className="text-center text-red-500 mb-3">{pomodorErrors}</p>
-          )}
         </div>
       )}
 

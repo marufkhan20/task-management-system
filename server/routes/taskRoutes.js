@@ -6,6 +6,8 @@ const {
   updateTaskController,
   restartTaskController,
   startTaskController,
+  updatePomodoroTaskIntervalsController,
+  updatePomodoroTaskBreakController,
 } = require("../controllers/taskController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -33,6 +35,20 @@ router.put("/start-task/:id", authMiddleware, startTaskController);
 
 // restart task
 router.put("/restart-task/:id", authMiddleware, restartTaskController);
+
+// update pomodoro task intervals
+router.put(
+  "/update-pomodoro-intervals/:id",
+  authMiddleware,
+  updatePomodoroTaskIntervalsController
+);
+
+// update pomodoro task intervals
+router.put(
+  "/update-pomodoro-break/:id",
+  authMiddleware,
+  updatePomodoroTaskBreakController
+);
 
 // update task
 router.put("/:id", authMiddleware, updateTaskController);

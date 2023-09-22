@@ -5,7 +5,6 @@ const getTasksByCategoryController = async (req, res) => {
   try {
     const { categoryId } = req.params || {};
     let tasks;
-    console.log("category", categoryId);
 
     if (categoryId === "all-tasks") {
       tasks = await Task.find();
@@ -40,18 +39,39 @@ const createNewTaskController = async (req, res) => {
     const intervalsBreakPoints = [];
 
     if (timerType === "countdown") {
-      const { startTimeHours, startTimeMinutes, endTimeHours, endTimeMinutes } =
-        timer || {};
+      const {
+        startTimeHours,
+        startTimeMinutes,
+        endTimeHours,
+        endTimeMinutes,
+        countDownHours,
+        countDownMinutes,
+      } = timer || {};
 
-      startTime.setHours(startTimeHours, startTimeMinutes, 0, 0);
-      endTime.setHours(endTimeHours, endTimeMinutes, 0, 0);
+      if (countDownHours || countDownMinutes) {
+        const currentTime = new Date();
+
+        startTime.setHours(
+          currentTime.getHours(),
+          currentTime.getMinutes(),
+          0,
+          0
+        );
+        endTime.setHours(
+          currentTime.getHours() + Number(countDownHours),
+          currentTime.getMinutes() + Number(countDownMinutes),
+          0,
+          0
+        );
+      } else {
+        startTime.setHours(startTimeHours, startTimeMinutes, 0, 0);
+        endTime.setHours(endTimeHours, endTimeMinutes, 0, 0);
+      }
     } else if (timerType === "stopwatch") {
       const { stopWatchHours, stopWatchMinutes, stopWatchSeconds } =
         timer || {};
 
       const currentTime = new Date();
-
-      console.log("stopwatch hours", Number(stopWatchHours));
 
       startTime.setHours(
         currentTime.getHours(),
@@ -66,84 +86,20 @@ const createNewTaskController = async (req, res) => {
         0
       );
     } else if (timerType === "pomodoro") {
-      const {
-        durationHours,
-        durationMinutes,
-        intervals,
-        shortBreakMinutes,
-        shortBreakSeconds,
-        longBreakMinutes,
-        longBreakSeconds,
-      } = timer || {};
-
-      const time = Number(durationHours) * 60 + Number(durationMinutes);
-
-      const breakTime =
-        shortBreakMinutes || shortBreakSeconds
-          ? Number(shortBreakMinutes) + Number(shortBreakSeconds)
-          : Number(longBreakMinutes) + Number(longBreakSeconds);
-
-      const fullTime = time + breakTime * intervals;
-
-      const fullTimeBreakTime = fullTime / intervals;
-
-      for (let i = 1; i <= intervals; i++) {
-        // break start time
-        const breakStartFullTime = fullTimeBreakTime * i - breakTime;
-        const breakStartRemainingMinutes = breakStartFullTime % 60;
-        const totalMinutesForHours =
-          (breakStartFullTime - breakStartRemainingMinutes) / 60;
-
-        const breakStartTime = new Date();
-        startTime.setHours(
-          breakStartTime.getHours() + Number(totalMinutesForHours),
-          breakStartTime.getMinutes() + Number(breakStartRemainingMinutes),
-          0,
-          0
-        );
-
-        // break end time
-        const breakEndFullTime = fullTimeBreakTime * i;
-        const breakEndRemainingMinutes = breakStartFullTime % 60;
-        const totalMinutesForEndHours =
-          (breakEndFullTime - breakEndRemainingMinutes) / 60;
-
-        // console.log("totalMinutesForEndHours", totalMinutesForEndHours);
-
-        // console.log("breakEndRemainingMinutes", breakEndRemainingMinutes);
-
-        const breakEndTime = new Date();
-        breakEndTime.setHours(
-          breakEndTime.getHours() + Number(totalMinutesForEndHours),
-          breakEndTime.getMinutes() + Number(breakEndRemainingMinutes),
-          0,
-          0
-        );
-
-        intervalsBreakPoints.push({
-          breakStart: breakStartTime,
-          breakEnd: breakEndTime,
-        });
-      }
-
-      // convert minute to hours
-      const remainingMinutes = fullTime % 60;
-      const totalMinutesForHours = (fullTime - remainingMinutes) / 60;
-
-      const totalHours = totalMinutesForHours;
+      const { durationHours, durationMinutes } = timer || {};
 
       const currentTime = new Date();
 
       startTime.setHours(
         currentTime.getHours(),
         currentTime.getMinutes(),
-        0,
+        currentTime.getSeconds(),
         0
       );
       endTime.setHours(
-        currentTime.getHours() + Number(totalHours),
-        currentTime.getMinutes() + Number(remainingMinutes),
-        0,
+        currentTime.getHours() + Number(durationHours),
+        currentTime.getMinutes() + Number(durationMinutes),
+        currentTime.getSeconds(),
         0
       );
     }
@@ -165,6 +121,14 @@ const createNewTaskController = async (req, res) => {
     }
 
     // create new task
+    const {
+      intervals,
+      shortBreakMinutes,
+      shortBreakSeconds,
+      longBreakMinutes,
+      longBreakSeconds,
+    } = timer || {};
+
     const newTask = new Task({
       name,
       startTime,
@@ -178,6 +142,11 @@ const createNewTaskController = async (req, res) => {
       editableTime: timer,
       timerType,
       intervalsBreakPoints,
+      intervals,
+      shortBreakMinutes,
+      shortBreakSeconds,
+      longBreakMinutes,
+      longBreakSeconds,
     });
 
     await newTask.save();
@@ -266,7 +235,6 @@ const startTaskController = async (req, res) => {
     if (task?._id) {
       let startTime = new Date(task?.startTime);
       let endTime = new Date(task?.endTime);
-      console.log(startTime);
 
       const pauseStartTimeNow = new Date(pauseStartTime);
       const pauseEndTimeNow = new Date(pauseEndTime);
@@ -328,7 +296,6 @@ const restartTaskController = async (req, res) => {
       const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
       const minutesNow = Math.floor((timeDifference % 3600000) / 60000); // 1 minute = 60000 milliseconds
       const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
-      console.log("hours now", hoursNow);
 
       // set new time
       const endCurrentTime = new Date();
@@ -348,11 +315,12 @@ const restartTaskController = async (req, res) => {
         0
       );
 
-      console.log("currentDate", currentDate);
-      console.log("endCurrentTime", endCurrentTime);
-
       task.startTime = currentDate;
       task.endTime = endCurrentTime;
+
+      if (task?.timerType === "pomodoro") {
+        task.completedIntervals = 0;
+      }
 
       await task.save();
 
@@ -366,6 +334,100 @@ const restartTaskController = async (req, res) => {
   }
 };
 
+// update pomodoro task intervals controller
+const updatePomodoroTaskIntervalsController = async (req, res) => {
+  try {
+    const { id } = req.params || {};
+    console.log("hello from intervals controller");
+
+    const task = await Task.findById(id);
+
+    if (task?._id && task.intervals !== task.completedIntervals + 1) {
+      const currentTime = new Date();
+      let startTime = new Date();
+      let endTime = new Date();
+
+      startTime = startTime.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes(),
+        currentTime.getSeconds(),
+        0
+      );
+      endTime = endTime.setHours(
+        currentTime.getHours() + Number(task?.editableTime?.durationHours),
+        currentTime.getMinutes() + Number(task?.editableTime?.durationMinutes),
+        currentTime.getSeconds(),
+        0
+      );
+
+      task.startTime = startTime;
+      task.endTime = endTime;
+      task.completedIntervals = task.completedIntervals + 1;
+    } else {
+      task.completedIntervals = task.completedIntervals + 1;
+    }
+
+    await task.save();
+
+    res.status(200).json(task);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Server error occurred!!",
+    });
+  }
+};
+
+// update pomodoro task break controller
+const updatePomodoroTaskBreakController = async (req, res) => {
+  try {
+    const { id } = req.params || {};
+    const task = await Task.findById(id);
+
+    if (task?._id) {
+      const {
+        shortBreakMinutes,
+        shortBreakSeconds,
+        longBreakMinutes,
+        longBreakSeconds,
+      } = task || {};
+
+      const currentTime = new Date();
+      let startTime = new Date();
+      let endTime = new Date();
+
+      startTime.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes(),
+        0,
+        0
+      );
+      endTime.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes() +
+          Number(shortBreakMinutes) +
+          Number(longBreakMinutes),
+        currentTime.getSeconds() +
+          Number(shortBreakSeconds) +
+          Number(longBreakSeconds),
+        0
+      );
+
+      task.breakStart = startTime;
+      task.breakEnd = endTime;
+
+      await task.save();
+
+      res.status(200).json(task);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Server error occurred!!",
+    });
+  }
+};
+
 module.exports = {
   getTasksByCategoryController,
   createNewTaskController,
@@ -374,4 +436,6 @@ module.exports = {
   updateTaskController,
   startTaskController,
   restartTaskController,
+  updatePomodoroTaskIntervalsController,
+  updatePomodoroTaskBreakController,
 };

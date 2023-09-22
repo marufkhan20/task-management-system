@@ -24,7 +24,17 @@ const taskSchema = new Schema(
       type: {},
     },
     timerType: String,
-    intervalsBreakPoints: Array,
+    intervals: Number,
+    completedIntervals: {
+      type: Number,
+      default: 0,
+    },
+    shortBreakMinutes: String,
+    shortBreakSeconds: String,
+    longBreakMinutes: String,
+    longBreakSeconds: String,
+    breakStart: Date,
+    breakEnd: Date,
   },
   { timestamps: true }
 );

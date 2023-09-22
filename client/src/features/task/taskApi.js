@@ -47,6 +47,18 @@ export const taskApi = apiSlice.injectEndpoints({
         method: "PUT",
       }),
     }),
+    updateTaskIntervals: builder.mutation({
+      query: (id) => ({
+        url: `/api/task/update-pomodoro-intervals/${id}`,
+        method: "PUT",
+      }),
+    }),
+    updateTaskBreak: builder.mutation({
+      query: (id) => ({
+        url: `/api/task/update-pomodoro-break/${id}`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
@@ -58,4 +70,6 @@ export const {
   useUpdateTaskMutation,
   useStartTaskMutation,
   useRestartTaskMutation,
+  useUpdateTaskBreakMutation,
+  useUpdateTaskIntervalsMutation,
 } = taskApi;
