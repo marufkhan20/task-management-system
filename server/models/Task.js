@@ -10,9 +10,7 @@ const taskSchema = new Schema(
     },
     startTime: Date,
     endTime: Date,
-    category: {
-      type: String,
-    },
+    category: String,
     tags: String,
     createdOn: String,
     description: String,

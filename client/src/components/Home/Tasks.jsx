@@ -12,6 +12,8 @@ const Tasks = ({ category }) => {
   const [openSwitchAlert, setOpenSwitchAlert] = useState(false);
   const [selectedTaskStatus, setSelectedTaskStatus] = useState("ongoing");
 
+  const [taskUpdate, setTaskUpdate] = useState(false);
+
   const [previousCategory, setPreviousCategory] = useState();
 
   // current active task handler
@@ -39,9 +41,12 @@ const Tasks = ({ category }) => {
   const [allTasks, setAllTasks] = useState([]);
   const [getTasks, setGetTasks] = useState(false);
 
-  const { data, refetch } = useGetTasksByCategoryQuery(category?._id, {
-    skip: !getTasks,
-  });
+  const { data, refetch, isLoading } = useGetTasksByCategoryQuery(
+    category?._id,
+    {
+      skip: !getTasks,
+    }
+  );
 
   useEffect(() => {
     if (category?._id) {
@@ -52,7 +57,12 @@ const Tasks = ({ category }) => {
     if (previousCategory && previousCategory !== category?._id) {
       refetch();
     }
-  }, [category, previousCategory, refetch]);
+
+    if (taskUpdate) {
+      refetch();
+      setTaskUpdate(false);
+    }
+  }, [category, previousCategory, refetch, taskUpdate]);
 
   useEffect(() => {
     setAllTasks([]);
@@ -71,6 +81,15 @@ const Tasks = ({ category }) => {
   return (
     <div>
       <TaskHeader category={category} />
+
+      {/* loader for task */}
+      {isLoading && (
+        <img
+          src="/img/loading.gif"
+          className="mt-10 mx-auto w-10 h-10"
+          alt="loader"
+        />
+      )}
 
       {/* current active task */}
       {currentActiveTask?._id && (
@@ -174,6 +193,12 @@ const Tasks = ({ category }) => {
         </div>
       </div>
 
+      {!isLoading && allTasks?.length === 0 && (
+        <p className="mt-10 text-center text-xl font-medium">
+          No Tasks Available. Create a new task.
+        </p>
+      )}
+
       {/* all tasks */}
       <div className="mt-5 hidden sm:flex flex-col gap-8 pb-10">
         {ongoingTasks?.length > 0 && (
@@ -184,6 +209,7 @@ const Tasks = ({ category }) => {
             setAllTasks={setAllTasks}
             currentActiveTask={currentActiveTask}
             allTasksWithStatus={allTasks}
+            setTaskUpdate={setTaskUpdate}
           />
         )}
         {upcomingTasks?.length > 0 && (
@@ -194,6 +220,7 @@ const Tasks = ({ category }) => {
             setAllTasks={setAllTasks}
             currentActiveTask={currentActiveTask}
             allTasksWithStatus={allTasks}
+            setTaskUpdate={setTaskUpdate}
           />
         )}
         {futureTasks?.length > 0 && (
@@ -204,6 +231,7 @@ const Tasks = ({ category }) => {
             setAllTasks={setAllTasks}
             currentActiveTask={currentActiveTask}
             allTasksWithStatus={allTasks}
+            setTaskUpdate={setTaskUpdate}
           />
         )}
         {completedTasks?.length > 0 && (
@@ -214,6 +242,7 @@ const Tasks = ({ category }) => {
             setAllTasks={setAllTasks}
             currentActiveTask={currentActiveTask}
             allTasksWithStatus={allTasks}
+            setTaskUpdate={setTaskUpdate}
           />
         )}
       </div>

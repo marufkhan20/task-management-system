@@ -31,6 +31,23 @@ const CurrentTask = ({
   const [breakTime, setBreakTime] = useState();
   const [breakTimeMsg, setBreakTimeMsg] = useState("");
 
+  // when pomodoro task timer in negetive
+  useEffect(() => {
+    if (currentActiveTask?.timerType === "pomodoro") {
+      if (hours < 0) {
+        setHours(0);
+      }
+
+      if (minutes < 0) {
+        setMinutes(0);
+      }
+
+      if (seconds < 0) {
+        setSeconds(0);
+      }
+    }
+  }, [hours, minutes, seconds]);
+
   let taskRemainingTime;
 
   // check task break time
@@ -51,11 +68,15 @@ const CurrentTask = ({
   }, [currentActiveTask]);
 
   // update task break
-  const [updateTaskBreak, { data: updatedBreakTask }] =
-    useUpdateTaskBreakMutation();
+  const [
+    updateTaskBreak,
+    { data: updatedBreakTask, isLoading: breakTimeLoading },
+  ] = useUpdateTaskBreakMutation();
 
   useEffect(() => {
+    console.log("updated break task", updatedBreakTask);
     if (updatedBreakTask?._id) {
+      console.log("updated break task", updatedBreakTask);
       setCurrentActiveTask(updatedBreakTask);
       setBreakTime(true);
       const updatedTasks = allTasks?.map((item) => {
@@ -82,8 +103,9 @@ const CurrentTask = ({
         updatedIntervalsTask?.intervals <=
         updatedIntervalsTask?.completedIntervals
       ) {
-        toast.success("Task completed successfully");
-        setBreakTime(true);
+        // toast.success("Task completed successfully");
+        // setBreakTime(true);
+        restartTask(currentActiveTask?._id);
       }
       setBreakTime(false);
       setCurrentActiveTask(updatedIntervalsTask);
@@ -136,12 +158,9 @@ const CurrentTask = ({
               }
 
               if (
-                currentDate.getSeconds() >=
-                  new Date(currentActiveTask?.breakEnd).getSeconds() &&
-                currentDate.getMinutes() >=
-                  new Date(currentActiveTask?.breakEnd).getMinutes() &&
-                currentDate.getHours() >=
-                  new Date(currentActiveTask?.breakEnd).getHours()
+                !breakTimeLoading &&
+                new Date().toTimeString() ===
+                  new Date(currentActiveTask?.breakEnd).toTimeString()
               ) {
                 console.log("send intervals request");
                 // update task invertals
@@ -187,18 +206,21 @@ const CurrentTask = ({
 
           const secondsNow = Math.floor((timeDifference % 60000) / 1000); // 1 second = 1000 milliseconds
 
-          if (minutesNow <= currentActiveTask?.shortBreakMinutes) {
-            setBreakTimeMsg(
-              `Now Short Break For ${
-                currentActiveTask?.shortBreakMinutes
-              } Minutes --
-              ${minutesNow || "00"}m ${secondsNow || "00"}s`
-            );
-          } else {
+          if (
+            currentActiveTask?.completedIntervals + 1 ===
+            currentActiveTask?.intervals
+          ) {
             setBreakTimeMsg(
               `Now Long Break For ${
                 currentActiveTask?.longBreakMinutes
               } Minutes -- 
+            ${minutesNow || "00"}m ${secondsNow || "00"}s`
+            );
+          } else {
+            setBreakTimeMsg(
+              `Now Short Break For ${
+                currentActiveTask?.shortBreakMinutes
+              } Minutes --
               ${minutesNow || "00"}m ${secondsNow || "00"}s`
             );
           }
@@ -243,22 +265,72 @@ const CurrentTask = ({
     updateTaskStatus({ id: _id, status: "completed" });
   };
 
-  // task start handler
+  // pause to task start handler
   const [startTask, { data: startedTask }] = useStartTaskMutation();
 
   useEffect(() => {
     if (startedTask?._id) {
-      setCurrentActiveTask(startedTask);
+      // update all tasks state
+      const updatedAllTask = allTasks?.map((task) => {
+        if (task?._id === startedTask?._id) {
+          return startedTask;
+        } else {
+          return task;
+        }
+      });
+
+      setAllTasks(updatedAllTask);
+
       setPauseStartTime("");
     }
   }, [startedTask]);
 
   const taskStartHandler = () => {
+    const task = { ...currentActiveTask };
+
+    // calculate pause time for start task
+    let startTime = new Date(task?.startTime);
+    let endTime = new Date(task?.endTime);
+
+    const pauseStartTimeNow = new Date(pauseStartTime);
+    const pauseEndTimeNow = new Date();
+
+    // get the difference between puase start time and puase end time
+    const hoursDifference =
+      pauseEndTimeNow.getHours() - pauseStartTimeNow.getHours();
+    const minutesDifference =
+      pauseEndTimeNow.getMinutes() - pauseStartTimeNow.getMinutes();
+    const secondsDifference =
+      pauseEndTimeNow.getSeconds() - pauseStartTimeNow.getSeconds();
+    const miliSecondsDifference =
+      pauseEndTimeNow.getMilliseconds() - pauseStartTimeNow.getMilliseconds();
+
+    // plus the pause diffrence time in start time
+    startTime = startTime.setHours(
+      startTime.getHours() + hoursDifference,
+      startTime.getMinutes() + minutesDifference,
+      startTime.getSeconds() + secondsDifference,
+      startTime.getMilliseconds() + miliSecondsDifference
+    );
+
+    // plus the pause diffrence time in end time
+    endTime = endTime.setHours(
+      endTime.getHours() + hoursDifference,
+      endTime.getMinutes() + minutesDifference,
+      endTime.getSeconds() + secondsDifference,
+      endTime.getMilliseconds() + miliSecondsDifference
+    );
+
+    task.startTime = startTime;
+    task.endTime = endTime;
+
+    setCurrentActiveTask(task);
+
     startTask({
       id: currentActiveTask?._id,
       data: {
-        pauseStartTime,
-        pauseEndTime: new Date(),
+        startTime,
+        endTime,
       },
     });
     setPauseStartTime("");
@@ -297,17 +369,18 @@ const CurrentTask = ({
               <h3>{name}</h3>
               <p className="my-3 text-xs">{description}</p>
               <div class="text-primary font-semibold flex items-center gap-1">
-                {tags
-                  ?.split(",")
-                  .slice(0, 2)
-                  ?.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                {tags?.split(",")[0].length > 0 &&
+                  tags
+                    ?.split(",")
+                    .slice(0, 2)
+                    ?.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                 {tags?.split(",").length > 2 && (
                   <span className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]">
                     +{tags?.split(",").length - 2}
@@ -319,7 +392,7 @@ const CurrentTask = ({
             {/* timer */}
             <div className="flex items-center flex-wrap justify-between gap-3">
               <div className="p-[34px] bg-[#F8F8F8] rounded font-medium text-[40px] relative min-w-[112px] text-center">
-                {currentActiveTask?.intervals && (
+                {currentActiveTask?.intervals !== 0 && (
                   <p className="text-xs px-3 py-1 border rounded-full border-heading absolute right-0 top-1">
                     {currentActiveTask?.completedIntervals}/
                     {currentActiveTask?.intervals} interval
@@ -329,7 +402,7 @@ const CurrentTask = ({
               </div>
               <h3 className="text-[40px]">:</h3>
               <div className="p-[34px] bg-[#F8F8F8] rounded font-medium text-[40px] min-w-[112px] text-center relative">
-                {currentActiveTask?.longBreakMinutes && (
+                {currentActiveTask?.longBreakMinutes !== "0" && (
                   <p className="text-xs px-3 py-1 border rounded-full border-heading absolute right-0 top-1">
                     +{currentActiveTask?.longBreakMinutes}m
                   </p>
@@ -338,7 +411,7 @@ const CurrentTask = ({
               </div>
               <h3 className="text-[40px]">:</h3>
               <div className="p-[34px] bg-[#F8F8F8] rounded font-medium text-[40px] min-w-[112px] text-center relative">
-                {currentActiveTask?.shortBreakMinutes && (
+                {currentActiveTask?.shortBreakMinutes !== "0" && (
                   <p className="text-xs px-3 py-1 border rounded-full border-heading absolute right-0 top-1">
                     +{currentActiveTask?.shortBreakMinutes}m
                   </p>

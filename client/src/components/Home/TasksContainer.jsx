@@ -1,5 +1,5 @@
-import React from "react";
-import { BiChevronDown } from "react-icons/bi";
+import React, { useState } from "react";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { BsThreeDots } from "react-icons/bs";
 import TaskItem from "./TaskItem";
 
@@ -10,7 +10,9 @@ const TasksContainer = ({
   allTasks,
   setAllTasks,
   allTasksWithStatus,
+  setTaskUpdate,
 }) => {
+  const [showAllTask, setShowAllTasks] = useState(false);
   return (
     <div>
       <div className="hidden sm:block">
@@ -79,29 +81,63 @@ const TasksContainer = ({
               </tr>
             </thead>
             <tbody>
-              {allTasks
-                ?.filter((task) => currentActiveTask?._id !== task?._id)
-                .map((item) => (
-                  <TaskItem
-                    key={item?._id}
-                    setCurrentActiveTask={setCurrentActiveTask}
-                    status={status}
-                    task={item}
-                    setAllTasks={setAllTasks}
-                    allTasks={allTasks}
-                    allTasksWithStatus={allTasksWithStatus}
-                  />
-                ))}
+              {showAllTask
+                ? allTasks
+                    ?.filter((task) => currentActiveTask?._id !== task?._id)
+                    .map((item) => (
+                      <TaskItem
+                        key={item?._id}
+                        setCurrentActiveTask={setCurrentActiveTask}
+                        status={status}
+                        task={item}
+                        setAllTasks={setAllTasks}
+                        allTasks={allTasks}
+                        allTasksWithStatus={allTasksWithStatus}
+                        setTaskUpdate={setTaskUpdate}
+                      />
+                    ))
+                : allTasks
+                    ?.slice(0, 4)
+                    ?.filter((task) => currentActiveTask?._id !== task?._id)
+                    .map((item) => (
+                      <TaskItem
+                        key={item?._id}
+                        setCurrentActiveTask={setCurrentActiveTask}
+                        status={status}
+                        task={item}
+                        setAllTasks={setAllTasks}
+                        allTasks={allTasks}
+                        allTasksWithStatus={allTasksWithStatus}
+                        setTaskUpdate={setTaskUpdate}
+                      />
+                    ))}
             </tbody>
           </table>
         </div>
 
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-[#777777] font-semibold cursor-pointer">
-            Show More
-          </span>
-          <BiChevronDown className="cursor-pointer" />
-        </div>
+        {!showAllTask && allTasks?.length > 4 && (
+          <div className="flex items-center justify-center gap-2">
+            <span
+              className="text-[#777777] font-semibold cursor-pointer"
+              onClick={() => setShowAllTasks(true)}
+            >
+              Show More
+            </span>
+            <BiChevronDown className="cursor-pointer" />
+          </div>
+        )}
+
+        {showAllTask && (
+          <div className="flex items-center justify-center gap-2">
+            <span
+              className="text-[#777777] font-semibold cursor-pointer"
+              onClick={() => setShowAllTasks(false)}
+            >
+              Show Less
+            </span>
+            <BiChevronUp className="cursor-pointer" />
+          </div>
+        )}
       </div>
 
       {/* for mobile device */}

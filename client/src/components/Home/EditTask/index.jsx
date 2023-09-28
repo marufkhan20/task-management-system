@@ -1,73 +1,66 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineCalendar, AiOutlineClose } from "react-icons/ai";
 import { FiTag } from "react-icons/fi";
 import { HiOutlineFolder } from "react-icons/hi2";
 import { MdAccessTime } from "react-icons/md";
-import { useGetCategoryQuery } from "../../../features/category/categoryApi";
 import { useUpdateTaskMutation } from "../../../features/task/taskApi";
 import Categories from "./Categories";
 import SelectTimer from "./SelectTimer";
 
-const EditTask = ({
-  editTask,
-  setEditTask,
-  task,
-  allTasksWithStatus,
-  setAllTasks,
-}) => {
+const EditTask = ({ task, editTask, setEditTask, setTaskUpdate }) => {
+  // ui open/close state
   const [openTimer, setOpenTimer] = useState(false);
   const [openCategory, setOpenCategory] = useState(false);
   const [openTags, setOpenTags] = useState(false);
-  const [selectedTime, setSelectedTime] = useState({});
-  const [getCategory, setGetCategory] = useState(false);
 
   // form data state
   const [name, setName] = useState("");
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [timer, setTimer] = useState({});
   const [category, setCategory] = useState({});
-  const [timerType, setTimerType] = useState();
   const [tags, setTags] = useState("");
   const [createdOn, setCreatedOn] = useState();
   const [description, setDescription] = useState();
-  const [editableTime, setEditableTime] = useState({});
+  const [errors, setErrors] = useState({});
+
+  // set edited task state
+  useEffect(() => {
+    if (task?._id) {
+      setName(task?.name);
+      setCategory(task?.category);
+      setTags(task?.tags);
+      setCreatedOn(task?.createdOn);
+      setDescription(task?.description);
+      if (task?.tags) {
+        setOpenTags(true);
+      }
+      setTimer(task?.editableTime);
+    }
+  }, [task]);
+
+  // set current date in created on
+  useEffect(() => {
+    if (!createdOn) {
+      const date = new Date();
+      const day =
+        date.getDate()?.toString().length === 1
+          ? `0${date.getDate()}`
+          : date.getDate();
+
+      const month =
+        date.getMonth()?.toString().length === 1
+          ? `0${date.getMonth() + 1}`
+          : date.getMonth;
+      const year = date.getFullYear();
+      setCreatedOn(`${year}-${month}-${day}`);
+    }
+  }, [createdOn]);
 
   // set time now
   const setTimeNow = (time) => {
-    setSelectedTime(time);
+    setTimer(time);
     setOpenTimer(false);
   };
-
-  // get category form server using category id
-  const { data } = useGetCategoryQuery(task?.category, { skip: !getCategory });
-
-  useEffect(() => {
-    if (data?._id) {
-      setCategory(data);
-    }
-  }, [data]);
-
-  // set previous state
-  useEffect(() => {
-    if (task?._id) {
-      setGetCategory(true);
-      setName(task.name);
-      setDescription(task.description);
-      setStartTime(task?.startTime);
-      setEndTime(task?.endTime);
-      setTags(task?.tags);
-      setCreatedOn(task?.createdOn);
-      setSelectedTime(task?.editableTime);
-      setEditableTime(task?.editableTime);
-      setTimerType(task?.timerType);
-    }
-
-    if (task?.tags) {
-      setOpenTags(true);
-    }
-  }, [task]);
 
   // api request prepare
   const [updateTask, { data: updatedTask, isError, error, isLoading }] =
@@ -79,34 +72,47 @@ const EditTask = ({
     }
 
     if (!isLoading && !isError && updatedTask?._id) {
-      toast.success("Task updated successfully");
-      const updatedTasks = allTasksWithStatus?.map((item) => {
-        if (item?._id === updatedTask?._id) {
-          return updatedTask;
-        } else {
-          return item;
-        }
-      });
-
-      setAllTasks(updatedTasks);
+      toast.success("Task update successfully");
       setEditTask(false);
+
+      // set inital state
+      setName("");
+      setTimer({});
+      setCategory({});
+      setTags("");
+      setDescription("");
+      setErrors({});
+      setTaskUpdate(true);
     }
-  }, [updatedTask, isError, error, isLoading, setEditTask]);
+  }, [updatedTask, isError, error, isLoading, setEditTask, setTaskUpdate]);
 
   // submit handler
   const submitHandler = () => {
+    // check validation
+    const validationErrors = {};
+
+    if (!name) {
+      validationErrors.name = "Task name is required";
+    }
+
+    if (!timer?.timerType && !timer?.scheduleForLater) {
+      validationErrors.timer = "Select Set Timer Or Set Schedule For Later";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     updateTask({
       id: task?._id,
       data: {
         name,
-        startTime,
-        endTime,
+        timer,
         createdOn,
         category,
         tags,
         description,
-        editableTime,
-        timerType,
       },
     });
   };
@@ -143,7 +149,7 @@ const EditTask = ({
           <div className="flex items-center gap-5 pb-6 border-b border-light-secondary">
             <img src="/img/icons/task.svg" alt="task icon" />
             <input
-              className="text-[#AFAFAF] placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
+              className="text-success placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
               type="text"
               placeholder="Task Name"
               value={name}
@@ -151,44 +157,47 @@ const EditTask = ({
             />
           </div>
 
+          {errors?.name && (
+            <p className="text-base text-red-600 font-medium mt-3">
+              {errors?.name}
+            </p>
+          )}
+
           <div className="pt-8 pb-6 border-b border-light-secondary mb-8 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 w-[25%]">
+            <div className="flex items-center relative justify-between">
+              <div className="flex items-center gap-3 w-full sm:w-[25%]">
                 <MdAccessTime className="text-xl text-[#4A3093]" />
                 <span className="text-heading font-semibold">Timer</span>
               </div>
-              <div className="w-[75%] relative">
+              <div className="w-full sm:w-[75%] sm:relative">
                 <button
                   className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left"
                   onClick={() => setOpenTimer(!openTimer)}
                 >
-                  {selectedTime?.startHour
-                    ? `${selectedTime?.startHour} : ${selectedTime?.startMinute} - ${selectedTime?.endHour} : ${selectedTime?.endHour}`
-                    : editableTime?.durationHour
-                    ? `${editableTime?.startMinues} : ${editableTime?.intervals}`
-                    : "Empty"}
+                  {!timer?.timerType && !timer?.scheduleForLater && "Empty"}
+                  {timer?.scheduleForLater && "Schedule For Later"}
+                  {timer?.timerType && timer?.timerType}
                 </button>
 
                 <SelectTimer
-                  setStartTime={setStartTime}
-                  setEndTime={setEndTime}
                   openTimer={openTimer}
-                  setOpenTimer={setOpenTimer}
                   setTimeNow={setTimeNow}
-                  editableTime={editableTime}
-                  setEditableTime={setEditableTime}
-                  setTimerType={setTimerType}
-                  task={task}
+                  timer={task?.editableTime}
                 />
               </div>
             </div>
+            {errors?.timer && (
+              <p className="text-base text-red-600 font-medium">
+                {errors?.timer}
+              </p>
+            )}
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 w-[25%]">
+            <div className="flex items-center justify-between relative">
+              <div className="flex items-center gap-3 w-full sm:w-[25%]">
                 <HiOutlineFolder className="text-xl text-success" />
                 <span className="text-heading font-semibold">Category</span>
               </div>
-              <div className="w-[75%] relative">
+              <div className="w-full sm:w-[75%] sm:relative">
                 <button
                   className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left"
                   onClick={() => setOpenCategory(!openCategory)}
@@ -205,14 +214,11 @@ const EditTask = ({
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 w-[25%]">
+              <div className="flex items-center gap-3 w-full sm:w-[25%]">
                 <AiOutlineCalendar className="text-xl text-secondary" />
                 <span className="text-heading font-semibold">Created On</span>
               </div>
-              <div className="w-[75%]">
-                {/* <button className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left">
-                  Empty
-                </button> */}
+              <div className="w-full sm:w-[75%]">
                 <input
                   className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left outline-none"
                   type="date"
@@ -225,11 +231,11 @@ const EditTask = ({
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 w-[25%]">
+              <div className="flex items-center gap-3 w-full sm:w-[25%]">
                 <FiTag className="text-xl text-warning" />
                 <span className="text-heading font-semibold">Tags</span>
               </div>
-              <div className="w-[75%]">
+              <div className="w-full sm:w-[75%]">
                 {!openTags ? (
                   <button
                     className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left border border-transparent"
@@ -239,7 +245,7 @@ const EditTask = ({
                   </button>
                 ) : (
                   <input
-                    className="text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
+                    className="text-success placeholder:text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
                     placeholder="tag1, tag2"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
@@ -251,7 +257,7 @@ const EditTask = ({
 
           <textarea
             placeholder="Description"
-            className="text-[#AFAFAF] placeholder:text-[#AFAFAF] text-2xl w-full block outline-none"
+            className="text-success placeholder:text-[#999999]  text-2xl w-full block outline-none"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />

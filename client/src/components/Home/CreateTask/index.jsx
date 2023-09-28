@@ -21,6 +21,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
   const [tags, setTags] = useState("");
   const [createdOn, setCreatedOn] = useState();
   const [description, setDescription] = useState();
+  const [errors, setErrors] = useState({});
 
   // set current date in created on
   useEffect(() => {
@@ -58,11 +59,37 @@ const CreateTask = ({ createTask, setCreateTask }) => {
     if (!isLoading && !isError && newTask?._id) {
       toast.success("Task created successfully");
       setCreateTask(false);
+
+      // set inital state
+      setName("");
+      setTimer({});
+      setCategory({});
+      setTags("");
+      setDescription("");
+      setErrors({});
     }
   }, [newTask, isError, error, isLoading, setCreateTask]);
 
   // submit handler
   const submitHandler = () => {
+    // check validation
+    const validationErrors = {};
+
+    if (!name) {
+      validationErrors.name = "Task name is required";
+    }
+
+    console.log("timer", timer);
+
+    if (!timer?.timerType && !timer?.scheduleForLater) {
+      validationErrors.timer = "Select Set Timer Or Set Schedule For Later";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     createNewTask({
       name,
       timer,
@@ -105,13 +132,19 @@ const CreateTask = ({ createTask, setCreateTask }) => {
           <div className="flex items-center gap-5 pb-6 border-b border-light-secondary">
             <img src="/img/icons/task.svg" alt="task icon" />
             <input
-              className="text-[#AFAFAF] placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
+              className="text-success placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
               type="text"
               placeholder="Task Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
+
+          {errors?.name && (
+            <p className="text-base text-red-600 font-medium mt-3">
+              {errors?.name}
+            </p>
+          )}
 
           <div className="pt-8 pb-6 border-b border-light-secondary mb-8 flex flex-col gap-2">
             <div className="flex items-center relative justify-between">
@@ -124,12 +157,19 @@ const CreateTask = ({ createTask, setCreateTask }) => {
                   className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left"
                   onClick={() => setOpenTimer(!openTimer)}
                 >
-                  Empty
+                  {!timer?.timerType && !timer?.scheduleForLater && "Empty"}
+                  {timer?.scheduleForLater && "Schedule For Later"}
+                  {timer?.timerType && timer?.timerType}
                 </button>
 
                 <SelectTimer openTimer={openTimer} setTimeNow={setTimeNow} />
               </div>
             </div>
+            {errors?.timer && (
+              <p className="text-base text-red-600 font-medium">
+                {errors?.timer}
+              </p>
+            )}
 
             <div className="flex items-center justify-between relative">
               <div className="flex items-center gap-3 w-full sm:w-[25%]">
@@ -184,7 +224,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
                   </button>
                 ) : (
                   <input
-                    className="text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
+                    className="text-success placeholder:text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
                     placeholder="tag1, tag2"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
@@ -196,7 +236,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
 
           <textarea
             placeholder="Description"
-            className="text-[#AFAFAF] placeholder:text-[#AFAFAF] text-2xl w-full block outline-none"
+            className="text-success placeholder:text-[#AFAFAF] text-2xl w-full block outline-none"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />

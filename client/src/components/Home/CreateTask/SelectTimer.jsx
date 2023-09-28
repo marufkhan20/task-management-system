@@ -15,11 +15,6 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   const [countDownMinutes, setCountDownMinutes] = useState();
   const [countdownErrors, setCountdownErrors] = useState("");
 
-  // stop watch state
-  const [stopWatchHours, setStopWatchHours] = useState();
-  const [stopWatchMinutes, setStopWatchMinutes] = useState();
-  const [stopWatchSeconds, setStopWatchSeconds] = useState();
-
   // pomodoro timer state
   const [durationHours, setDurationHours] = useState();
   const [durationMinutes, setDurationMinutes] = useState();
@@ -29,12 +24,12 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   const [longBreakMinutes, setLongBreakMinutes] = useState();
   const [longBreakSeconds, setLongBreakSeconds] = useState();
 
+  // timer errors
+  const [timerErrors, setTimerErrors] = useState("");
+
   // when timer option state change
   useEffect(() => {
     if (selectOpt === "countdown") {
-      setStopWatchHours();
-      setStopWatchMinutes();
-      setStopWatchSeconds();
       setDurationHours();
       setDurationMinutes();
       setIntervals();
@@ -57,9 +52,6 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
     } else if (selectOpt === "pomodoro") {
       setEndTimeHours();
       setEndTimeMinutes();
-      setStopWatchHours();
-      setStopWatchMinutes();
-      setStopWatchSeconds();
       setCountDownHours();
       setCountDownMinutes();
     }
@@ -82,29 +74,42 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
     }
   }, [countDownHours, countDownMinutes, endTimeHours, endTimeMinutes]);
 
-  // when user set stopwatch time then select option change
-  useEffect(() => {
-    if (stopWatchHours || stopWatchMinutes || stopWatchSeconds) {
-      setTimerType("stopwatch");
-    } else {
-      setTimerType("countdown");
-    }
-  }, [stopWatchHours, stopWatchMinutes, stopWatchSeconds]);
-
   // set now handler
   const setNowHandler = () => {
+    // check validation
+    if (timerType === "countdown" || timerType === "stopwatch") {
+      if (
+        !endTimeHours &&
+        !endTimeMinutes &&
+        !countDownHours &&
+        !countDownMinutes
+      ) {
+        setTimerErrors(true);
+        return;
+      }
+    } else if (timerType === "pomodoro") {
+      if (!durationHours && !durationMinutes) {
+        setTimerErrors(true);
+        return;
+      }
+    }
+
+    if (countdownErrors) {
+      return;
+    }
+
+    setTimerErrors(false);
+
+    // set timer
     setTimeNow({
       timerType,
       startTimeHours: startTimeHours || 0,
       startTimeMinutes: startTimeMinutes || 0,
       endTimeHours: endTimeHours || 0,
       endTimeMinutes: endTimeMinutes || 0,
-      stopWatchHours: stopWatchHours || 0,
-      stopWatchMinutes: stopWatchMinutes || 0,
-      stopWatchSeconds: stopWatchSeconds || 0,
       durationHours: durationHours || 0,
       durationMinutes: durationMinutes || 0,
-      intervals: Number(intervals),
+      intervals: Number(intervals) || 0,
       shortBreakMinutes: shortBreakMinutes || 0,
       shortBreakSeconds: shortBreakSeconds || 0,
       longBreakMinutes: longBreakMinutes || 0,
@@ -165,7 +170,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={startTimeHours}
                         onChange={(e) => setStartTimeHours(e.target.value)}
                       />
@@ -173,7 +178,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={startTimeMinutes}
                         onChange={(e) => setStartTimeMinutes(e.target.value)}
                       />
@@ -189,7 +194,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={endTimeHours}
                         onChange={(e) => setEndTimeHours(e.target.value)}
                       />
@@ -197,7 +202,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={endTimeMinutes}
                         onChange={(e) => setEndTimeMinutes(e.target.value)}
                       />
@@ -214,7 +219,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={countDownHours}
                         onChange={(e) => setCountDownHours(e.target.value)}
                       />
@@ -222,7 +227,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={countDownMinutes}
                         onChange={(e) => setCountDownMinutes(e.target.value)}
                       />
@@ -245,42 +250,17 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
           <div className="px-5 pb-5">
             <h3>Set a stopwatch (Counting Up)</h3>
             <div className="mt-5 flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-fit py-3 border border-[#4A3093] rounded relative">
-                  <div className="flex items-center w-auto px-[10px] justify-center">
-                    <input
-                      type="text"
-                      placeholder="00"
-                      className="outline-none w-8 text-center"
-                      value={stopWatchHours}
-                      onChange={(e) => setStopWatchHours(e.target.value)}
-                    />
-                    <span>:</span>
-                    <input
-                      type="text"
-                      placeholder="00"
-                      className="outline-none w-8 text-center"
-                      value={stopWatchMinutes}
-                      onChange={(e) => setStopWatchMinutes(e.target.value)}
-                    />
-                    <span>:</span>
-                    <input
-                      type="text"
-                      placeholder="00"
-                      className="outline-none w-8 text-center"
-                      value={stopWatchSeconds}
-                      onChange={(e) => setStopWatchSeconds(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={timerType === "stopwatch"}
                   name=""
                   id="stopwatch"
+                  onChange={() =>
+                    setTimerType(
+                      timerType === "countdown" ? "stopwatch" : "countdown"
+                    )
+                  }
                 />
                 <label
                   htmlFor="stopwatch"
@@ -312,7 +292,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={durationHours}
                         onChange={(e) => setDurationHours(e.target.value)}
                       />
@@ -320,7 +300,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={durationMinutes}
                         onChange={(e) => setDurationMinutes(e.target.value)}
                       />
@@ -357,7 +337,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="05"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={shortBreakMinutes}
                         onChange={(e) => setShortBreakMinutes(e.target.value)}
                       />
@@ -365,7 +345,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={shortBreakSeconds}
                         onChange={(e) => setShortBreakSeconds(e.target.value)}
                       />
@@ -386,7 +366,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={longBreakMinutes}
                         onChange={(e) => setLongBreakMinutes(e.target.value)}
                       />
@@ -394,7 +374,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="outline-none w-8 text-center"
+                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
                         value={longBreakSeconds}
                         onChange={(e) => setLongBreakSeconds(e.target.value)}
                       />
@@ -408,19 +388,29 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
       )}
 
       {/* footer */}
-      <div className="px-5 py-4 flex items-center justify-between  border-t border-light-secondary">
-        <button
-          className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white"
-          onClick={() => setTimeNow({ scheduleForLater: true })}
-        >
-          Schedule for later
-        </button>
-        <button
-          className="font-semibold p-[10px] border border-secondary rounded-lg bg-secondary text-white transition-all hover:text-heading hover:bg-transparent"
-          onClick={setNowHandler}
-        >
-          Set Now
-        </button>
+      <div>
+        <div className="px-5 py-4 flex items-center justify-between  border-t border-light-secondary">
+          <button
+            className="text-xs font-semibold py-[10px] px-2 rounded-lg border border-secondary text-heading transition-all hover:bg-secondary hover:border-secondary hover:text-white"
+            onClick={() => {
+              setTimerErrors(false);
+              setTimeNow({ scheduleForLater: true });
+            }}
+          >
+            Schedule for later
+          </button>
+          <button
+            className="font-semibold p-[10px] border border-secondary rounded-lg bg-secondary text-white transition-all hover:text-heading hover:bg-transparent"
+            onClick={setNowHandler}
+          >
+            Set Now
+          </button>
+        </div>
+        {timerErrors && (
+          <p className="mb-4 text-center text-red-600 font-medium">
+            Please set timer Or Click Schedule for later button.
+          </p>
+        )}
       </div>
     </div>
   );

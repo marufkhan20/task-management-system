@@ -18,11 +18,12 @@ const TaskItem = ({
   setCurrentActiveTask,
   setAllTasks,
   allTasksWithStatus,
+  setTaskUpdate,
 }) => {
   // set remaining time
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
+  // const [hours, setHours] = useState("00");
+  // const [minutes, setMinutes] = useState("00");
+  // const [seconds, setSeconds] = useState("00");
 
   // mobile device
   const [openTask, setOpenTask] = useState("");
@@ -69,12 +70,6 @@ const TaskItem = ({
       ) {
         updateTaskStatus({ id: task?._id, status: "ongoing" });
       }
-      // else if (
-      //   new Date() > new Date(task?.endTime) &&
-      //   task?.status !== "completed"
-      // ) {
-      //   updateTaskStatus({ id: task?._id, status: "completed" });
-      // }
 
       // Assuming you have start and end times in ISO 8601 format
       const startTimeStr = task?.startTime;
@@ -166,17 +161,21 @@ const TaskItem = ({
           {task?.createdOn}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold flex items-center gap-1">
-          {task?.tags
-            ?.split(",")
-            .slice(0, 2)
-            ?.map((tag) => (
-              <span
-                key={tag}
-                className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]"
-              >
-                {tag}
-              </span>
-            ))}
+          {task?.tags?.split(",")[0].length > 0 ? (
+            task?.tags
+              ?.split(",")
+              .slice(0, 2)
+              ?.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]"
+                >
+                  {tag}
+                </span>
+              ))
+          ) : (
+            <p>No Tag</p>
+          )}
           {task?.tags?.split(",").length > 2 && (
             <span className="bg-[#EAEAEA] text-xs font-semibold text-[#777777] py-1 px-[10px] rounded cursor-pointer transition-all hover:bg-[#c1c0c0]">
               +{task?.tags?.split(",").length - 2}
@@ -243,6 +242,7 @@ const TaskItem = ({
         task={task}
         allTasksWithStatus={allTasksWithStatus}
         setAllTasks={setAllTasks}
+        setTaskUpdate={setTaskUpdate}
       />
 
       {/* for mobile device */}
@@ -325,7 +325,7 @@ const TaskItem = ({
             <div className="flex justify-between">
               <p>Timer</p>
               <div>
-                {status === "ongoing" && `${hours}h ${minutes}m ${seconds}s`}
+                {/* {status === "ongoing" && `${hours}h ${minutes}m ${seconds}s`} */}
                 {status === "upcoming" && "N/A"}
                 {status === "completed" &&
                   `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}

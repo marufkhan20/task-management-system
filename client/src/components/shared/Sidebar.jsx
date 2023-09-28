@@ -205,13 +205,13 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
           )}
         </div>
 
-        <div>
+        {/* <div>
           <h3 className="px-[18px] mb-2">More</h3>
           <li className="flex items-center gap-4 font-semibold text-[#F32626] py-[10px] px-[18px] transition-all hover:bg-white cursor-pointer">
             <img src="/img/icons/trash.svg" alt="icon" />
             <span>Trash</span>
           </li>
-        </div>
+        </div> */}
       </div>
 
       {/* create new task */}
