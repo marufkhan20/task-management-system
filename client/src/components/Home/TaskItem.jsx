@@ -183,8 +183,7 @@ const TaskItem = ({
           )}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
-          {task?.timerType === "stopwatch" &&
-            `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
+          {task?.timerType === "stopwatch" && `Stop Watch`}
 
           {status === "upcoming" && "N/A"}
 
@@ -288,7 +287,7 @@ const TaskItem = ({
                   status === "completed" && "text-decoration: line-through"
                 }`}
               >
-                {task?.description}
+                {task?.description?.slice(0, 20)}
               </p>
             </div>
             <div className="flex justify-between">
@@ -325,9 +324,17 @@ const TaskItem = ({
             <div className="flex justify-between">
               <p>Timer</p>
               <div>
-                {/* {status === "ongoing" && `${hours}h ${minutes}m ${seconds}s`} */}
+                {task?.timerType === "stopwatch" && `Stop Watch`}
+
                 {status === "upcoming" && "N/A"}
+
+                {status === "future" && "N/A"}
+
                 {status === "completed" &&
+                  `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
+
+                {status === "ongoing" &&
+                  task?.timerType !== "stopwatch" &&
                   `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
               </div>
             </div>

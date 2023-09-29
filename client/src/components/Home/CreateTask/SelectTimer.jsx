@@ -77,7 +77,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
   // set now handler
   const setNowHandler = () => {
     // check validation
-    if (timerType === "countdown" || timerType === "stopwatch") {
+    if (timerType === "countdown") {
       if (
         !endTimeHours &&
         !endTimeMinutes &&
@@ -170,7 +170,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={startTimeHours}
                         onChange={(e) => setStartTimeHours(e.target.value)}
                       />
@@ -178,7 +178,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={startTimeMinutes}
                         onChange={(e) => setStartTimeMinutes(e.target.value)}
                       />
@@ -194,7 +194,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={endTimeHours}
                         onChange={(e) => setEndTimeHours(e.target.value)}
                       />
@@ -202,7 +202,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={endTimeMinutes}
                         onChange={(e) => setEndTimeMinutes(e.target.value)}
                       />
@@ -219,7 +219,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={countDownHours}
                         onChange={(e) => setCountDownHours(e.target.value)}
                       />
@@ -227,7 +227,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={countDownMinutes}
                         onChange={(e) => setCountDownMinutes(e.target.value)}
                       />
@@ -292,7 +292,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={durationHours}
                         onChange={(e) => setDurationHours(e.target.value)}
                       />
@@ -300,7 +300,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="10"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={durationMinutes}
                         onChange={(e) => setDurationMinutes(e.target.value)}
                       />
@@ -337,7 +337,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="05"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={shortBreakMinutes}
                         onChange={(e) => setShortBreakMinutes(e.target.value)}
                       />
@@ -345,7 +345,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={shortBreakSeconds}
                         onChange={(e) => setShortBreakSeconds(e.target.value)}
                       />
@@ -366,7 +366,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="15"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={longBreakMinutes}
                         onChange={(e) => setLongBreakMinutes(e.target.value)}
                       />
@@ -374,7 +374,7 @@ const SelectTimer = ({ setTimeNow, openTimer }) => {
                       <input
                         type="text"
                         placeholder="00"
-                        className="text-success placeholder:text-[#999999] outline-none w-8 text-center"
+                        className="text-heading placeholder:text-[#999999] outline-none w-8 text-center"
                         value={longBreakSeconds}
                         onChange={(e) => setLongBreakSeconds(e.target.value)}
                       />

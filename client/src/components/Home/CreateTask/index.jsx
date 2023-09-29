@@ -132,7 +132,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
           <div className="flex items-center gap-5 pb-6 border-b border-light-secondary">
             <img src="/img/icons/task.svg" alt="task icon" />
             <input
-              className="text-success placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
+              className="text-heading placeholder:text-[#AFAFAF] font-semibold text-[32px] outline-none w-full"
               type="text"
               placeholder="Task Name"
               value={name}
@@ -199,7 +199,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
               </div>
               <div className="w-full sm:w-[75%]">
                 <input
-                  className="text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left outline-none"
+                  className="text-heading placeholder:text-[#999999] text-base font-medium py-2 transition-all hover:bg-light-secondary px-3 rounded w-full text-left outline-none"
                   type="date"
                   name=""
                   id=""
@@ -224,7 +224,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
                   </button>
                 ) : (
                   <input
-                    className="text-success placeholder:text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
+                    className="text-heading placeholder:text-[#999999] text-base font-medium py-2 transition-all px-3 rounded w-full text-left outline-none border border-light-secondary bg-gray-100"
                     placeholder="tag1, tag2"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
@@ -236,7 +236,7 @@ const CreateTask = ({ createTask, setCreateTask }) => {
 
           <textarea
             placeholder="Description"
-            className="text-success placeholder:text-[#AFAFAF] text-2xl w-full block outline-none"
+            className="text-heading placeholder:text-[#AFAFAF] text-2xl w-full block outline-none"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />

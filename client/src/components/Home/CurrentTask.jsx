@@ -139,7 +139,13 @@ const CurrentTask = ({
       taskRemainingTime = setInterval(() => {
         if (currentActiveTask?.timerType === "pomodoro") {
           const currentDate = new Date();
-          const endTime = new Date(currentActiveTask?.endTime);
+          let endTime;
+
+          if (currentActiveTask?.timerType === "stopwatch") {
+            endTime = new Date();
+          } else {
+            endTime = new Date(currentActiveTask?.endTime);
+          }
 
           if (currentDate.toTimeString() >= endTime.toTimeString()) {
             if (

@@ -39,7 +39,7 @@ const createNewTaskController = async (req, res) => {
     const intervalsBreakPoints = [];
 
     if (!timerType?.scheduleForLater) {
-      if (timerType === "countdown" || timerType === "stopwatch") {
+      if (timerType === "countdown") {
         const {
           startTimeHours,
           startTimeMinutes,
@@ -78,6 +78,14 @@ const createNewTaskController = async (req, res) => {
             0
           );
         }
+      } else if (timerType === "stopwatch") {
+        const currentTime = new Date();
+        startTime.setHours(
+          currentTime.getHours(),
+          currentTime.getMinutes(),
+          currentTime.getSeconds(),
+          0
+        );
       } else if (timerType === "pomodoro") {
         const { durationHours, durationMinutes } = timer || {};
 
@@ -101,7 +109,9 @@ const createNewTaskController = async (req, res) => {
     // generate task status
     let status = "upcoming";
 
-    if (new Date(startTime) > new Date()) {
+    if (timerType === "stopwatch") {
+      status = "ongoing";
+    } else if (new Date(startTime) > new Date()) {
       status = "future";
     } else if (Object.keys(timer)?.length === 0) {
       status = "upcoming";
@@ -218,10 +228,9 @@ const updateTaskController = async (req, res) => {
 
     let startTime = new Date();
     let endTime = new Date();
-    const intervalsBreakPoints = [];
 
     if (!timerType?.scheduleForLater) {
-      if (timerType === "countdown" || timerType === "stopwatch") {
+      if (timerType === "countdown") {
         const {
           startTimeHours,
           startTimeMinutes,
@@ -243,6 +252,14 @@ const updateTaskController = async (req, res) => {
           endTime.setHours(
             currentTime.getHours() + Number(countDownHours),
             currentTime.getMinutes() + Number(countDownMinutes),
+            currentTime.getSeconds(),
+            0
+          );
+        } else if (timerType === "stopwatch") {
+          const currentTime = new Date();
+          startTime.setHours(
+            currentTime.getHours(),
+            currentTime.getMinutes(),
             currentTime.getSeconds(),
             0
           );
@@ -283,7 +300,9 @@ const updateTaskController = async (req, res) => {
     // generate task status
     let status = "upcoming";
 
-    if (new Date(startTime) > new Date()) {
+    if (timerType === "stopwatch") {
+      status = "ongoing";
+    } else if (new Date(startTime) > new Date()) {
       status = "future";
     } else if (Object.keys(timer)?.length === 0) {
       status = "upcoming";
