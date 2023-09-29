@@ -31,6 +31,9 @@ const CurrentTask = ({
   const [breakTime, setBreakTime] = useState();
   const [breakTimeMsg, setBreakTimeMsg] = useState("");
 
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [showElapsedTime, setShowElapsedTime] = useState(false);
+
   // when pomodoro task timer in negetive
   useEffect(() => {
     if (currentActiveTask?.timerType === "pomodoro") {
@@ -182,13 +185,24 @@ const CurrentTask = ({
 
         // Convert the time strings to Date objects
         const startTime = new Date(startTimeStr);
-        const endTime = new Date(endTimeStr);
+        let endTime = new Date(endTimeStr);
 
         // Get the current time
         const currentTime = new Date();
 
         // Calculate the time difference in milliseconds
         let timeDifference;
+
+        timeDifference = currentTime - startTime;
+
+        const hoursNowForElapsedTime = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
+        const minutesNowForElapsedTime = Math.floor(
+          (timeDifference % 3600000) / 60000
+        ); // 1 minute = 60000 milliseconds
+
+        setElapsedTime(
+          `${hoursNowForElapsedTime}h ${minutesNowForElapsedTime}m`
+        );
 
         if (currentActiveTask?.timerType === "stopwatch") {
           timeDifference = currentTime - startTime;
@@ -425,7 +439,19 @@ const CurrentTask = ({
                 <h2>{seconds}</h2>
               </div>
               <div className="flex flex-col gap-4 text-lg ml-4">
-                <PiTimer className="cursor-pointer" />
+                <div
+                  className="flex items-center gap-2"
+                  onClick={() => setShowElapsedTime(!showElapsedTime)}
+                >
+                  <PiTimer className="cursor-pointer" />
+                  <p
+                    className={`${
+                      showElapsedTime ? "block" : "hidden"
+                    } text-sm font-medium`}
+                  >
+                    {elapsedTime}
+                  </p>
+                </div>
                 <BsHourglassTop className="cursor-pointer" />
               </div>
             </div>
