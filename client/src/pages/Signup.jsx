@@ -25,9 +25,9 @@ const Signup = () => {
 
     if (!isLoading && !isError && user?._id) {
       toast.success("User Created Successfully");
-      navigate("/verify-email");
+      navigate(`/verify-email/${email}`);
     }
-  }, [user, isLoading, isError, error, navigate]);
+  }, [user, isLoading, isError, error, navigate, email]);
 
   // submit handler
   const submitHandler = (e) => {

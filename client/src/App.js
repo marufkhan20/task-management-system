@@ -41,7 +41,7 @@ const App = () => {
           }
         />
         <Route
-          path="/verify-email"
+          path="/verify-email/:email"
           element={
             <PublicRoute>
               <AccountVerificatoin />

@@ -10,12 +10,13 @@ const tabs = {
 
 const ForgotPassword = () => {
   const [activeTab, setActiveTab] = useState(1);
+  const [email, setEmail] = useState("");
 
   const Tab = tabs[activeTab];
 
   return (
     <AuthSecondaryLayout>
-      <Tab setActiveTab={setActiveTab} />
+      <Tab setActiveTab={setActiveTab} email={email} setEmail={setEmail} />
     </AuthSecondaryLayout>
   );
 };

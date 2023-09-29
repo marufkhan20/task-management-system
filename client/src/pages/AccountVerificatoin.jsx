@@ -1,10 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import AuthSecondaryLayout from "../components/layout/AuthSecondaryLayout";
 import Button from "../components/ui/Button";
 
 const AccountVerificatoin = () => {
-  console.log("hello");
+  const { email } = useParams();
   return (
     <AuthSecondaryLayout>
       <div className="flex flex-col gap-6 items-center">
@@ -12,7 +12,7 @@ const AccountVerificatoin = () => {
           <img className="w-6 h-6" src="/img/icons/mail.svg" alt="mail icon" />
         </div>
         <h3 className="text-xl">Verification Sent</h3>
-        <p>Verification link has been sent to john123@gmail.com.</p>
+        <p>Verification link has been sent to {email}.</p>
         <p>
           Didn’t get them? Please check your spam or junk folder, and if it's
           not there, please click on the '

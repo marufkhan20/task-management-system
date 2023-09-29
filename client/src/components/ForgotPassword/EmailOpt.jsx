@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useGetUserByEmailQuery } from "../../features/auth/authApi";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 
-const EmailOpt = ({ setActiveTab }) => {
+const EmailOpt = ({ setActiveTab, setEmail: setParentEmail }) => {
   const [email, setEmail] = useState();
   const [errors, setErrors] = useState({});
   const [getUser, setGetUser] = useState(false);
@@ -25,6 +26,7 @@ const EmailOpt = ({ setActiveTab }) => {
 
     if (user?._id) {
       setActiveTab(2);
+      setParentEmail(email);
     }
   }, [user, isError, error, setActiveTab]);
 

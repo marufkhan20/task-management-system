@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { GrClose } from "react-icons/gr";
 import { HiOutlineFolder } from "react-icons/hi2";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userLoggedOut } from "../../features/auth/authSlice";
 import { useGetCategoriesByUserQuery } from "../../features/category/categoryApi";
 import CreateCategory from "../Home/CreateCategory";
@@ -20,6 +20,8 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
   const [createCategory, setCreateCategory] = useState(false);
   const [categories, setCategories] = useState([]);
   const [logoutOpt, setLogoutOpt] = useState(false);
+
+  const { user } = useSelector((state) => state.auth || {});
 
   const [showCrateOpt, setShowCreateOpt] = useState(false);
 
@@ -50,8 +52,7 @@ const Sidebar = ({ category, setCategory, setShowSidebar }) => {
             } py-2`}
             onClick={() => setLogoutOpt(!logoutOpt)}
           >
-            <img src="/img/avatar.png" alt="user" />
-            <span>John Doe</span>
+            <span>{user?.email}</span>
             <BsChevronDown />
           </div>
 
