@@ -33,6 +33,8 @@ const CurrentTask = ({
 
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showElapsedTime, setShowElapsedTime] = useState(false);
+  const [sandClockTime, setSandClockTime] = useState("");
+  const [sandClockTimeShow, setSandClockTimeShow] = useState(false);
 
   // when pomodoro task timer in negetive
   useEffect(() => {
@@ -127,6 +129,33 @@ const CurrentTask = ({
   // calculate remaining task time
   useEffect(() => {
     setPreventTask(currentActiveTask);
+
+    if (currentActiveTask?._id !== preventTask?._id) {
+      if (currentActiveTask?.timerType === "countdown") {
+        if (
+          currentActiveTask?.editableTime?.endTimeHours ||
+          currentActiveTask?.editableTime?.endTimeMinutes
+        ) {
+          setSandClockTime(
+            `${currentActiveTask?.editableTime?.startTimeHours} : ${currentActiveTask?.editableTime?.startTimeMinutes} - ${currentActiveTask?.editableTime?.endTimeHours} : ${currentActiveTask?.editableTime?.endTimeMinutes}`
+          );
+        } else {
+          setSandClockTime(
+            `${currentActiveTask?.editableTime?.countDownHours} : ${currentActiveTask?.editableTime?.countDownMinutes}`
+          );
+        }
+      } else if (currentActiveTask?.timerType === "pomodoro") {
+        setSandClockTime(
+          `${currentActiveTask?.editableTime?.durationHours} : ${currentActiveTask?.editableTime?.durationMinutes}`
+        );
+      } else if (currentActiveTask?.timerType === "stopwatch") {
+        setSandClockTime(
+          `${currentActiveTask?.editableTime?.startTimeHours} : ${
+            currentActiveTask?.editableTime?.startTimeMinutes
+          } - ${new Date().getHours()} : ${new Date().getMinutes()}`
+        );
+      }
+    }
 
     if (currentActiveTask?._id !== preventTask?._id) {
       clearInterval(taskRemainingTime);
@@ -452,7 +481,19 @@ const CurrentTask = ({
                     {elapsedTime}
                   </p>
                 </div>
-                <BsHourglassTop className="cursor-pointer" />
+                <div
+                  className="flex items-center gap-2"
+                  onClick={() => setSandClockTimeShow(!sandClockTimeShow)}
+                >
+                  <BsHourglassTop className="cursor-pointer" />
+                  <p
+                    className={`${
+                      sandClockTimeShow ? "block" : "hidden"
+                    } text-sm font-medium`}
+                  >
+                    {sandClockTime}
+                  </p>
+                </div>
               </div>
             </div>
 

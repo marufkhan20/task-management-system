@@ -73,20 +73,22 @@ const TaskItem = ({
 
       // Assuming you have start and end times in ISO 8601 format
       const startTimeStr = task?.startTime;
-      const endTimeStr = task?.endTime;
+      // const endTimeStr = task?.endTime;
 
       // Convert the time strings to Date objects
       const startTime = new Date(startTimeStr);
-      const endTime = new Date(endTimeStr);
+      // const endTime = new Date(endTimeStr);
 
       // Get the current time
       const currentTime = new Date();
 
       // Calculate the time difference in milliseconds
-      const timeDifference =
-        task?.timerType === "stopwatch"
-          ? endTime - (currentTime >= startTime ? currentTime : startTime)
-          : endTime - startTime;
+      // const timeDifference =
+      // task?.timerType === "stopwatch"
+      //   ? endTime - (currentTime >= startTime ? currentTime : startTime)
+      //   : endTime - startTime;
+
+      const timeDifference = currentTime - startTime;
 
       // Convert the time difference to hours, minutes, and seconds
       const hoursNow = Math.floor(timeDifference / 3600000); // 1 hour = 3600000 milliseconds
@@ -155,7 +157,9 @@ const TaskItem = ({
           {task?.name}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
-          {task?.description}
+          {task?.description?.length > 20
+            ? task?.description?.substring(0, 20) + " ..."
+            : task?.description}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
           {task?.createdOn}
@@ -183,7 +187,7 @@ const TaskItem = ({
           )}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap text-primary font-semibold">
-          {task?.timerType === "stopwatch" && `Stop Watch`}
+          {/* {task?.timerType === "stopwatch" && `Stop Watch`} */}
 
           {status === "upcoming" && "N/A"}
 
@@ -193,7 +197,6 @@ const TaskItem = ({
             `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
 
           {status === "ongoing" &&
-            task?.timerType !== "stopwatch" &&
             `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
         </td>
         <td class="px-6 py-2 whitespace-no-wrap flex items-center gap-2">
@@ -287,7 +290,9 @@ const TaskItem = ({
                   status === "completed" && "text-decoration: line-through"
                 }`}
               >
-                {task?.description?.slice(0, 20)}
+                {task?.description?.length > 20
+                  ? task?.description?.substring(0, 20) + " ..."
+                  : task?.description}
               </p>
             </div>
             <div className="flex justify-between">
@@ -324,7 +329,7 @@ const TaskItem = ({
             <div className="flex justify-between">
               <p>Timer</p>
               <div>
-                {task?.timerType === "stopwatch" && `Stop Watch`}
+                {/* {task?.timerType === "stopwatch" && `Stop Watch`} */}
 
                 {status === "upcoming" && "N/A"}
 
@@ -334,7 +339,6 @@ const TaskItem = ({
                   `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
 
                 {status === "ongoing" &&
-                  task?.timerType !== "stopwatch" &&
                   `${completedTaskTime?.hours}h ${completedTaskTime?.minutes}m ${completedTaskTime?.seconds}s`}
               </div>
             </div>
