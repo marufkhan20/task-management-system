@@ -4,16 +4,20 @@ const Task = require("../models/Task");
 const getTasksByCategoryController = async (req, res) => {
   try {
     const { categoryId } = req.params || {};
+    const { _id } = req.user || {};
+
     let tasks;
 
     if (categoryId === "all-tasks") {
-      tasks = await Task.find();
+      tasks = await Task.find({ user: _id });
     } else if (categoryId === "inbox") {
-      tasks = await Task.find({ category: "inbox" });
+      tasks = await Task.find({ category: "inbox", user: _id });
     } else {
       // get all tasks by category
-      tasks = await Task.find({ category: categoryId });
+      tasks = await Task.find({ category: categoryId, user: _id });
     }
+
+    console.log("tasks", tasks);
 
     res.status(200).json(tasks);
   } catch (err) {
