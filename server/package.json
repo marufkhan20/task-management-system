@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js",
+    "dev": "node init && nodemon app.js",
+    "start": "node init && node app.js",
     "vercel-build": "echo hello"
   },
   "dependencies": {
